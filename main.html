@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en-US" style="background-color: powderblue;">
+    <style>
+        th, td {
+  border: 1px solid black;
+  border-radius: 10px;
+}
+table {
+
+  width: 50%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+  text-align: center;
+
+}
+.main {
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #D6EEEE;
+}
+    .fontstyle{
+        color: deeppink;
+        }
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+}
+
+li {
+  float: left;
+  size: 20px;
+
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 26px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111111;
+}
+
+.city {
+  background-color: tomato;
+  color: white;
+  border: 2px solid black;
+  margin: 20px;
+  padding: 20px;}
+    </style>
+
+
+    <head style="font-size: large;text-align: center;">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="author" content="houxuan zhang">
+
+        <!-- picture memory -->
+        <title id="myHeader">
+            小郭小张的照片记忆
+        </title>
+        <button onclick="displayResult()">点击试一试呗</button>
+
+<script>
+function displayResult() {
+  document.getElementById("myHeader").innerHTML = "嘿嘿你终于来了，快来看看吧!";
+}
+</script>
+    </head>
+    <body>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#news">News</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#about">About</a></li>
+          </ul>
+
+    <h1 style="text-align: center; font-size: 60px; font-family: Verdana, Geneva, Tahoma, sans-serif;">  Houxuan <i style="color: brown;">
+      <b>Zhang</b></i> and Linsan <i style="color: bisque;"><b>Guo</b></i></h1>
+    <h2 style="color:darkslategray; text-align: center; font-size: 60px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+        我们的照片
+
+    </h2>
+
+
+    <table>
+        <caption class="fontstyle" >点击地点跳转</caption>
+        <tr>
+            <th>地点</th>
+            <th>时间</th>
+        </tr>
+        <tr>
+            <td> <p><a href="#wuhan"><em>武汉</em></a></p></td>
+            <td>2024.12</td>
+        </tr>
+    </table>
+
+    
+
+
+    <p><a href="#wuhan">Go to <em>武汉</em></a></p>
+
+
+
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <img src="sansan1.jpg" style="width: 400px; height: 600px;">
+    <img src="sansan2.jpg" style="width: 400px; height: 600px;">
+    <img src="sansan3.jpg" style="width: 400px; height: 600px;">
+</div>
+
+<div class="city">
+    <h1 id="wuhan">武汉之旅</h1>
+    <p>
+        武汉小张和小郭是分开去的，小张是在2023年7月去的，小郭是在2025年1月去的
+    </p>
+
+
+</div>
+
+</body>
+    
+</html>
