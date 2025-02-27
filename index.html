@@ -2,6 +2,58 @@
 <!DOCTYPE html>
 <html lang="en-US" style="background-color: powderblue;">
     <style>
+ /* 让所有照片区域居中 */
+.photo-grid {
+    display: grid;
+    max-width: 80%;  /* 控制整体宽度，让照片更加紧凑 */
+    margin: 0 auto;  /* 居中显示 */
+    gap: 10px;  /* 减小图片间距，使其更紧凑 */
+    justify-content: center;
+}
+
+/* 统一照片大小，适用于不同网格布局 */
+.photo-grid img {
+    width: 100%;  /* 让图片自适应父级容器 */
+    height: 100%; /* 确保高度一致 */
+    max-width: 280px; /* 增大单张图片的大小 */
+    max-height: 280px;
+    object-fit: cover;  /* 填充整个区域，避免变形 */
+    border-radius: 8px; /* 轻微圆角 */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.photo-grid img:hover {
+    transform: scale(1.03);
+}
+
+/* 适配不同列数 */
+.grid-cols-2x2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3x3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4x4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* 响应式布局优化 */
+@media (max-width: 1024px) {
+    .grid-cols-3x3, .grid-cols-4x4 {
+        grid-template-columns: repeat(2, 1fr); /* 平板上变为 2 列 */
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-cols-3x3, .grid-cols-4x4, .grid-cols-2x2 {
+        grid-template-columns: repeat(1, 1fr); /* 手机端变为 1 列 */
+    }
+}
+
+
         th, td {
   border: 1px solid black;
   border-radius: 10px;
@@ -105,30 +157,142 @@ function displayResult() {
             <td> <p><a href="#wuhan"><em>武汉</em></a></p></td>
             <td>2024.12</td>
         </tr>
+        <tr>
+          <td> <p><a href="#chendu"><em>成都</em></a></p></td>
+          <td>2024.12</td>
+      </tr>
+      <tr>
+        <td> <p><a href="#chongqing"><em>重庆</em></a></p></td>
+        <td>2024.12</td>
+    </tr>    
+    <tr>
+      <td> <p><a href="#24fallsemester"><em>24秋季学期</em></a></p></td>
+      <td>2024.12</td>
+  </tr>
+  <tr>
+    <td> <p><a href="#zhoushan"><em>舟山</em></a></p></td>
+    <td>2024.12</td>
+</tr>
+      
+        
     </table>
 
     
 
 
-    <p><a href="#wuhan">Go to <em>武汉</em></a></p>
+    <!-- <p><a href="#wuhan">Go to <em>武汉</em></a></p> -->
 
 
 
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
-    <img src="sansan1.jpg" style="width: 400px; height: 600px;">
-    <img src="sansan2.jpg" style="width: 400px; height: 600px;">
-    <img src="sansan3.jpg" style="width: 400px; height: 600px;">
+    <img src="picture/sansan/sansan1.jpg" style="width: 400px; height: 600px;">
+    <img src="picture/sansan/sansan2.jpg" style="width: 400px; height: 600px;">
+    <img src="picture/sansan/sansan3.jpg" style="width: 400px; height: 600px;">
 </div>
 
 <div class="city">
-    <h1 id="wuhan">武汉之旅</h1>
-    <p>
-        武汉小张和小郭是分开去的，小张是在2023年7月去的，小郭是在2025年1月去的
-    </p>
-
-
+  <h1 id="wuhan">武汉之旅</h1>
+  <p>武汉小张和小郭是分开去的，小张是在2023年7月去的，小郭是在2025年1月去的</p>
 </div>
+
+<!-- 确保 photo-grid 结构完整 -->
+<div class="photo-grid grid-cols-2x2">
+  <img src="picture/wuhan/wuhan1.jpg" alt="Wuhan Photo 1">
+  <img src="picture/wuhan/wuhan2.jpg" alt="Wuhan Photo 2">
+  <img src="picture/wuhan/wuhan3.jpg" alt="Wuhan Photo 3">
+  <img src="picture/wuhan/wuhan4.jpg" alt="Wuhan Photo 4">
+</div> <!-- 这里补上正确的 </div> 关闭标签 -->
+
+
+  <div class="city">
+  <h1 id="chendu">成都之旅</h1>
+  <p>
+      成都有好多好多大熊猫
+  </p>
+</div>
+
+
+  <div class="photo-grid grid-cols-3x3">
+      <img src="picture/chengdu/wuhan1.jpg" alt="Wuhan Photo 1">
+      <img src="picture/chengdu/wuhan2.jpg" alt="Wuhan Photo 2">
+      <img src="picture/chengdu/wuhan3.jpg" alt="Wuhan Photo 3">
+      <img src="picture/chengdu/wuhan4.jpg" alt="Wuhan Photo 4">
+      <img src="picture/chengdu/wuhan5.jpg" alt="Wuhan Photo 5">
+      <img src="picture/chengdu/wuhan6.jpg" alt="Wuhan Photo 6">
+      <img src="picture/chengdu/wuhan7.jpg" alt="Wuhan Photo 7">
+      <img src="picture/chengdu/wuhan8.jpg" alt="Wuhan Photo 8">
+      <img src="picture/chengdu/wuhan9.jpg" alt="Wuhan Photo 9">
+  </div>
+
+
+  <div class="city">
+    <h1 id="chongqing">重庆之旅</h1>
+    <p>重庆有美味的火锅和壮观的山城景色</p>
+  </div>
+  <div class="photo-grid grid-cols-2x2">
+    <img src="picture/chongqing/chongqing1.jpg" alt="Chongqing Photo 1">
+    <img src="picture/chongqing/chongqing2.jpg" alt="Chongqing Photo 2">
+    <img src="picture/chongqing/chongqing3.jpg" alt="Chongqing Photo 3">
+    <img src="picture/chongqing/chongqing4.jpg" alt="Chongqing Photo 4">
+</div>
+
+<div class="city">
+  <h1 id="chongqing">2024秋季学期</h1>
+  <p>这个学期我们进入了大三</p>
+</div>
+<div class="photo-grid grid-cols-3x3">
+  <img src="picture/24fallsemester/24fallsemester1.jpg" alt="24Fall Semester Photo 1">
+  <img src="picture/24fallsemester/24fallsemester2.jpg" alt="24Fall Semester Photo 2">
+  <img src="picture/24fallsemester/24fallsemester3.jpg" alt="24Fall Semester Photo 3">
+  <img src="picture/24fallsemester/24fallsemester4.jpg" alt="24Fall Semester Photo 4">
+  <img src="picture/24fallsemester/24fallsemester5.jpg" alt="24Fall Semester Photo 5">
+  <img src="picture/24fallsemester/24fallsemester6.jpg" alt="24Fall Semester Photo 6">
+  <img src="picture/24fallsemester/24fallsemester7.jpg" alt="24Fall Semester Photo 7">
+  <img src="picture/24fallsemester/24fallsemester8.jpg" alt="24Fall Semester Photo 8">
+  <img src="picture/24fallsemester/24fallsemester9.jpg" alt="24Fall Semester Photo 9">
+</div>
+<div class="city">
+  <h1 id="taizhou">台州之旅</h1>
+  <p>台州的风景很美，还有很多美食！还听了著名戏曲家的戏！</p>
+</div>
+
+<div class="photo-grid grid-cols-2x2">
+  <img src="picture/taizhou/taizhou1.jpg" alt="Taizhou Photo 1">
+  <img src="picture/taizhou/taizhou2.jpg" alt="Taizhou Photo 2">
+  <img src="picture/taizhou/taizhou3.jpg" alt="Taizhou Photo 3">
+  <img src="picture/taizhou/taizhou4.jpg" alt="Taizhou Photo 4">
+</div>
+
+<div class="city">
+  <h1 id="zhoushan">舟山之旅</h1>
+  <p>舟山的海鲜超美味，还有壮丽的海景！我们迎来了三周年！</p>
+</div>
+
+<div class="photo-grid grid-cols-4x4">
+  <img src="picture/zhoushan/zhoushan1.jpg" alt="Zhoushan Photo 1">
+  <img src="picture/zhoushan/zhoushan2.jpg" alt="Zhoushan Photo 2">
+  <img src="picture/zhoushan/zhoushan3.jpg" alt="Zhoushan Photo 3">
+  <img src="picture/zhoushan/zhoushan4.jpg" alt="Zhoushan Photo 4">
+  <img src="picture/zhoushan/zhoushan5.jpg" alt="Zhoushan Photo 5">
+  <img src="picture/zhoushan/zhoushan6.jpg" alt="Zhoushan Photo 6">
+  <img src="picture/zhoushan/zhoushan7.jpg" alt="Zhoushan Photo 7">
+  <img src="picture/zhoushan/zhoushan8.jpg" alt="Zhoushan Photo 8">
+  <img src="picture/zhoushan/zhoushan9.jpg" alt="Zhoushan Photo 9">
+  <img src="picture/zhoushan/zhoushan10.jpg" alt="Zhoushan Photo 10">
+  <img src="picture/zhoushan/zhoushan11.jpg" alt="Zhoushan Photo 11">
+  <img src="picture/zhoushan/zhoushan12.jpg" alt="Zhoushan Photo 12">
+  <img src="picture/zhoushan/zhoushan13.jpg" alt="Zhoushan Photo 13">
+  <img src="picture/zhoushan/zhoushan14.jpg" alt="Zhoushan Photo 14">
+  <img src="picture/zhoushan/zhoushan15.jpg" alt="Zhoushan Photo 15">
+  <img src="picture/zhoushan/zhoushan16.jpg" alt="Zhoushan Photo 16">
+</div>
+
+
+
+
+
+
 
 </body>
     
