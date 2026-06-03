@@ -1,299 +1,3601 @@
-
 <!DOCTYPE html>
-<html lang="en-US" style="background-color: powderblue;">
-    <style>
- /* 让所有照片区域居中 */
-.photo-grid {
-    display: grid;
-    max-width: 80%;  /* 控制整体宽度，让照片更加紧凑 */
-    margin: 0 auto;  /* 居中显示 */
-    gap: 10px;  /* 减小图片间距，使其更紧凑 */
-    justify-content: center;
-}
-
-/* 统一照片大小，适用于不同网格布局 */
-.photo-grid img {
-    width: 100%;  /* 让图片自适应父级容器 */
-    height: 100%; /* 确保高度一致 */
-    max-width: 280px; /* 增大单张图片的大小 */
-    max-height: 280px;
-    object-fit: cover;  /* 填充整个区域，避免变形 */
-    border-radius: 8px; /* 轻微圆角 */
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease-in-out;
-}
-
-.photo-grid img:hover {
-    transform: scale(1.03);
-}
-
-/* 适配不同列数 */
-.grid-cols-2x2 {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.grid-cols-3x3 {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.grid-cols-4x4 {
-    grid-template-columns: repeat(4, 1fr);
-}
-
-/* 响应式布局优化 */
-@media (max-width: 1024px) {
-    .grid-cols-3x3, .grid-cols-4x4 {
-        grid-template-columns: repeat(2, 1fr); /* 平板上变为 2 列 */
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Houxuan Zhang">
+  <title>Houxuan & Linsan · 我们去过的地方</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --page: #f5f5f7;
+      --page-soft: #fbfbfd;
+      --surface: rgba(255, 255, 255, 0.78);
+      --surface-strong: rgba(255, 255, 255, 0.92);
+      --line: rgba(29, 29, 31, 0.1);
+      --line-strong: rgba(29, 29, 31, 0.16);
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --muted-strong: #4b5563;
+      --accent: #0071e3;
+      --accent-soft: rgba(0, 113, 227, 0.12);
+      --shadow: 0 24px 70px rgba(22, 24, 29, 0.14);
+      --shadow-soft: 0 14px 36px rgba(22, 24, 29, 0.09);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max-width: 1180px;
     }
-}
 
-@media (max-width: 768px) {
-    .grid-cols-3x3, .grid-cols-4x4, .grid-cols-2x2 {
-        grid-template-columns: repeat(1, 1fr); /* 手机端变为 1 列 */
+    * {
+      box-sizing: border-box;
     }
-}
 
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 96px;
+      background: var(--page);
+    }
 
-        th, td {
-  border: 1px solid black;
-  border-radius: 10px;
-}
-table {
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(245, 245, 247, 0) 34%),
+        linear-gradient(145deg, #fbfbfd 0%, #f5f5f7 46%, #eef1f5 100%);
+      font-family: "SF Pro Display", "PingFang SC", "Helvetica Neue", "Avenir Next", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
 
-  width: 50%;
-}
+    body.lightbox-open {
+      overflow: hidden;
+    }
 
-th, td {
-  text-align: left;
-  padding: 8px;
-  text-align: center;
+    a {
+      color: inherit;
+    }
 
-}
-.main {
-  text-align: center;
-}
+    img {
+      display: block;
+      max-width: 100%;
+    }
 
-tr:nth-child(even) {
-  background-color: #D6EEEE;
-}
-    .fontstyle{
-        color: deeppink;
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 18px auto 56px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 14px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 58px;
+      padding: 10px 12px 10px 18px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 10px 30px rgba(22, 24, 29, 0.08);
+      backdrop-filter: blur(22px) saturate(160%);
+    }
+
+    .nav-logo {
+      white-space: nowrap;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted-strong);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 650;
+      transition: color 180ms ease, background-color 180ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.05);
+      outline: none;
+    }
+
+    .hero {
+      position: relative;
+      display: flex;
+      min-height: min(760px, calc(100svh - 98px));
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      background: #111;
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 28%;
+      filter: saturate(0.94) contrast(0.96);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0.1) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.54) 100%);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+      align-items: end;
+      gap: clamp(24px, 5vw, 54px);
+      padding: clamp(28px, 6vw, 64px);
+    }
+
+    .hero-copy {
+      max-width: 620px;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(0, 0, 0, 0.34);
+    }
+
+    .eyebrow,
+    .hero-eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 760;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero-eyebrow {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 680px;
+      font-size: clamp(46px, 8vw, 92px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 18px 0 0;
+      max-width: 620px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(16px, 2vw, 21px);
+      line-height: 1.72;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #111;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    }
+
+    .button-link.secondary {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      backdrop-filter: blur(16px);
+    }
+
+    .button-link:hover,
+    .button-link:focus-visible {
+      transform: translateY(-1px);
+      background: #fff;
+      outline: none;
+    }
+
+    .button-link.secondary:hover,
+    .button-link.secondary:focus-visible {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .hero-collage {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      grid-template-rows: 170px 210px;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .photo-button,
+    .cover-button {
+      appearance: none;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+      color: inherit;
+      text-align: inherit;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: 20px;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
+      transform: translateZ(0);
+    }
+
+    .hero-card:first-child {
+      grid-row: span 2;
+    }
+
+    .hero-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 260ms ease;
+    }
+
+    .hero-card:hover img,
+    .hero-card:focus-visible img {
+      transform: scale(1.025);
+    }
+
+    .hero-card:focus-visible,
+    .photo-button:focus-visible,
+    .cover-button:focus-visible {
+      outline: 3px solid rgba(0, 113, 227, 0.45);
+      outline-offset: 3px;
+    }
+
+    .memory-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      margin: 24px 0 8px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .memory-stat {
+      padding: 22px clamp(14px, 3vw, 28px);
+      border-right: 1px solid var(--line);
+    }
+
+    .memory-stat:last-child {
+      border-right: 0;
+    }
+
+    .memory-stat strong {
+      display: block;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .memory-stat span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .section {
+      padding: clamp(58px, 8vw, 92px) 0 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+
+    .section-subtitle {
+      max-width: 620px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .place-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .place-card {
+      position: relative;
+      min-height: 176px;
+      padding: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface-strong);
+      color: inherit;
+      text-decoration: none;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .place-card::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background:
+        linear-gradient(135deg, var(--accent-soft), rgba(255, 255, 255, 0.2)),
+        var(--page);
+      border: 1px solid rgba(0, 113, 227, 0.18);
+    }
+
+    .place-card:hover,
+    .place-card:focus-visible {
+      transform: translateY(-3px);
+      border-color: rgba(0, 113, 227, 0.28);
+      box-shadow: var(--shadow-soft);
+      outline: none;
+    }
+
+    .place-name {
+      margin: 0 0 6px;
+      font-size: 25px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .place-meta {
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 780;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .place-desc {
+      margin: 0;
+      max-width: 92%;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.58;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0;
+      margin: 16px 0 0;
+      list-style: none;
+    }
+
+    .timeline li {
+      position: relative;
+      padding: 16px 16px 16px 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.52);
+      font-size: 14px;
+      line-height: 1.58;
+    }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      top: 19px;
+      left: 17px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px var(--accent-soft);
+    }
+
+    .timeline strong {
+      color: var(--text);
+    }
+
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.9fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .map-panel,
+    .map-sidebar,
+    .place-editor {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+    }
+
+    .map-panel {
+      position: relative;
+      overflow: hidden;
+      min-height: 470px;
+    }
+
+    #travel-map {
+      width: 100%;
+      height: 100%;
+      min-height: 470px;
+      background: linear-gradient(180deg, #edf4ff 0%, #dde7f2 100%);
+    }
+
+    .map-toolbar {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 12px 34px rgba(22, 24, 29, 0.12);
+      backdrop-filter: blur(18px);
+    }
+
+    .map-toolbar input,
+    .form-grid input,
+    .form-grid textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .map-toolbar input {
+      min-height: 42px;
+      padding: 9px 13px;
+    }
+
+    .map-toolbar input:focus,
+    .form-grid input:focus,
+    .form-grid textarea:focus {
+      border-color: rgba(0, 113, 227, 0.44);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+    }
+
+    .icon-button,
+    .text-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 760;
+      transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    }
+
+    .icon-button {
+      width: 42px;
+      padding: 0;
+    }
+
+    .text-button {
+      padding: 9px 16px;
+    }
+
+    .text-button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .text-button.danger {
+      border-color: rgba(220, 38, 38, 0.22);
+      color: #b91c1c;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible,
+    .text-button:hover,
+    .text-button:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(0, 113, 227, 0.28);
+      background: #fff;
+      outline: none;
+    }
+
+    .text-button.primary:hover,
+    .text-button.primary:focus-visible {
+      background: #0066cc;
+      color: #fff;
+    }
+
+    .map-config-panel,
+    .map-status {
+      position: absolute;
+      z-index: 6;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+    }
+
+    .map-config-panel {
+      display: grid;
+      gap: 10px;
+      max-width: 560px;
+      padding: 16px;
+    }
+
+    .map-config-panel[hidden],
+    .map-status[hidden],
+    .place-editor[hidden],
+    .search-results:empty {
+      display: none;
+    }
+
+    .map-config-panel h3,
+    .place-editor h3,
+    .place-list-head h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .map-config-panel p,
+    .form-help,
+    .map-status {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .map-config-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .map-config-grid input {
+      min-height: 40px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      font: inherit;
+    }
+
+    .map-status {
+      width: fit-content;
+      max-width: min(560px, calc(100% - 36px));
+      padding: 10px 14px;
+    }
+
+    .map-sidebar {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      padding: 12px;
+      min-height: 470px;
+    }
+
+    .map-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .map-summary-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .map-summary-item strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .map-summary-item span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .place-list-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 2px;
+    }
+
+    .map-route {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .map-chip {
+      display: block;
+      width: 100%;
+      padding: 16px 16px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 760;
+      text-align: left;
+      transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    .map-chip:hover,
+    .map-chip:focus-visible {
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.86);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .map-chip small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 560;
+    }
+
+    .map-chip-note {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted-strong);
+      font-size: 12px;
+      font-weight: 520;
+      line-height: 1.45;
+    }
+
+    .map-chip-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .place-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 113, 227, 0.1);
+      color: #075da8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .amap-place-marker {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 6px 10px 6px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.86);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 10px 28px rgba(22, 24, 29, 0.22);
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      transform: translateZ(0);
+    }
+
+    .amap-place-marker::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      bottom: -6px;
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.94);
+      border-right: 1px solid rgba(255, 255, 255, 0.86);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.86);
+      transform: rotate(45deg);
+    }
+
+    .amap-place-marker span {
+      width: 16px;
+      height: 16px;
+      border: 4px solid var(--accent);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+    }
+
+    .amap-place-marker strong {
+      position: relative;
+      z-index: 1;
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .amap-place-marker.is-custom span {
+      border-color: #34c759;
+      box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.14);
+    }
+
+    .amap-info-window {
+      width: min(330px, calc(100vw - 36px));
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 18px 44px rgba(22, 24, 29, 0.22);
+      backdrop-filter: blur(18px);
+    }
+
+    .amap-info-window img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #e8eaed;
+    }
+
+    .amap-info-window h3 {
+      margin: 10px 0 4px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .amap-info-window p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .info-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .photo-stack {
+      position: relative;
+      width: 100%;
+      min-height: 176px;
+      border-radius: 18px;
+      perspective: 900px;
+      isolation: isolate;
+    }
+
+    .photo-stack.is-empty {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .amap-info-window .photo-stack {
+      min-height: 178px;
+      margin-bottom: 12px;
+    }
+
+    .photo-stack-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: var(--fan-z);
+      width: min(70%, 360px);
+      height: 84%;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.84);
+      border-radius: 18px;
+      padding: 0;
+      background: #e8eaed;
+      box-shadow: 0 16px 36px rgba(22, 24, 29, 0.15);
+      cursor: pointer;
+      transform: translate3d(calc(-50% + var(--fan-x)), calc(-50% + var(--fan-y)), 0) rotate(var(--fan-rotate));
+      transform-origin: 50% 110%;
+      transition: transform 240ms ease-out, box-shadow 240ms ease-out, filter 240ms ease-out;
+    }
+
+    .photo-stack-card.is-front {
+      z-index: 80;
+      box-shadow: 0 24px 58px rgba(22, 24, 29, 0.24);
+      transform: translate3d(-50%, calc(-50% - 14px), 44px) rotate(0deg) scale(1.045);
+    }
+
+    .photo-stack-card:focus-visible {
+      outline: 3px solid rgba(0, 113, 227, 0.38);
+      outline-offset: 4px;
+    }
+
+    .photo-stack-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      aspect-ratio: auto;
+      object-fit: cover;
+      border-radius: inherit;
+      pointer-events: none;
+      transition: filter 240ms ease-out;
+    }
+
+    .photo-stack-card.is-front img {
+      filter: saturate(1.04);
+    }
+
+    .photo-stack-empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      border: 1px dashed var(--line-strong);
+      border-radius: 18px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .album-cover-card {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.86fr) minmax(0, 1fr);
+      gap: 22px;
+      align-items: center;
+      margin: 18px 0 16px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+    }
+
+    .album-cover-card .photo-stack {
+      min-height: clamp(210px, 28vw, 330px);
+    }
+
+    .album-cover-content {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+
+    .album-cover-content h4 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 38px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .album-cover-content p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.68;
+    }
+
+    .album-cover-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .photo-grid.is-collapsed {
+      display: none;
+    }
+
+    .map-fallback {
+      display: grid;
+      height: 100%;
+      min-height: 470px;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .place-editor {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      box-shadow: none;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-grid label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted-strong);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .form-grid input,
+    .form-grid textarea {
+      min-height: 42px;
+      padding: 10px 12px;
+      font-weight: 520;
+    }
+
+    .form-grid textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .tag-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .tag-options input {
+      width: auto;
+      min-height: auto;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .search-results {
+      display: grid;
+      gap: 6px;
+    }
+
+    .search-result-button {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      transition: border-color 180ms ease, background-color 180ms ease;
+    }
+
+    .search-result-button:hover,
+    .search-result-button:focus-visible {
+      border-color: rgba(0, 113, 227, 0.3);
+      background: #fff;
+      outline: none;
+    }
+
+    .search-result-button small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .custom-albums:empty {
+      display: none;
+    }
+
+    .empty-state {
+      padding: 16px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 16px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .cover-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.9fr 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .cover-button {
+      position: relative;
+      min-height: 360px;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .cover-button:nth-child(2) {
+      min-height: 430px;
+    }
+
+    .cover-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 280ms ease;
+    }
+
+    .cover-button:hover img,
+    .cover-button:focus-visible img {
+      transform: scale(1.025);
+    }
+
+    .album-block {
+      padding: clamp(28px, 5vw, 44px) 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .album-block:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .album-block.focus-target {
+      animation: sectionPulse 900ms ease;
+    }
+
+    .album-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .album-header h3 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 36px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .album-header span {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .album-block > p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+      grid-auto-rows: 8px;
+      grid-auto-flow: dense;
+      gap: 10px;
+    }
+
+    .photo-button {
+      position: relative;
+      grid-row-end: span 24;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #e8eaed;
+      box-shadow: 0 8px 24px rgba(22, 24, 29, 0.1);
+      transform: translateZ(0);
+    }
+
+    .photo-button.is-tall {
+      grid-row-end: span 34;
+    }
+
+    .photo-button.is-wide {
+      grid-column: span 2;
+      grid-row-end: span 26;
+    }
+
+    .photo-button.is-large {
+      grid-column: span 2;
+      grid-row-end: span 38;
+    }
+
+    .photo-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 260ms ease, filter 260ms ease;
+    }
+
+    .photo-button:hover img,
+    .photo-button:focus-visible img {
+      transform: scale(1.025);
+      filter: saturate(1.04);
+    }
+
+    .footer {
+      margin: 48px 0 0;
+      padding: 24px 0 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 520ms ease-out, transform 520ms ease-out;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .place-detail {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.52);
+      backdrop-filter: blur(18px);
+    }
+
+    .place-detail[hidden] {
+      display: none;
+    }
+
+    .place-detail-card {
+      width: min(920px, 100%);
+      max-height: min(820px, calc(100vh - 48px));
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+    }
+
+    .place-detail-hero {
+      position: relative;
+      min-height: 260px;
+      overflow: hidden;
+      border-radius: 26px 26px 0 0;
+      background: #e8eaed;
+    }
+
+    .place-detail-hero img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+    }
+
+    .place-detail-hero .photo-stack {
+      min-height: 300px;
+      border-radius: 0;
+    }
+
+    .place-detail-hero .photo-stack-card {
+      border-radius: 18px;
+    }
+
+    .place-detail-hero .photo-stack-card img {
+      min-height: 0;
+    }
+
+    .place-detail-body {
+      display: grid;
+      gap: 16px;
+      padding: clamp(18px, 4vw, 28px);
+    }
+
+    .place-detail-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .place-detail-head h3 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .place-detail-close {
+      flex: 0 0 auto;
+    }
+
+    .place-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .place-detail-note {
+      margin: 0;
+      color: var(--muted-strong);
+      font-size: 15px;
+      line-height: 1.72;
+      white-space: pre-wrap;
+    }
+
+    .detail-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .photo-manager {
+      position: fixed;
+      inset: 0;
+      z-index: 980;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.54);
+      backdrop-filter: blur(18px);
+    }
+
+    .photo-manager[hidden] {
+      display: none;
+    }
+
+    .photo-manager-card {
+      width: min(860px, 100%);
+      max-height: min(820px, calc(100vh - 48px));
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+    }
+
+    .photo-manager-head,
+    .photo-manager-body {
+      padding: clamp(18px, 4vw, 28px);
+    }
+
+    .photo-manager-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .photo-manager-head h3 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 38px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .photo-manager-body {
+      display: grid;
+      gap: 18px;
+    }
+
+    .photo-manager-upload {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .photo-manager-upload input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.86);
+      font: inherit;
+    }
+
+    .memory-note-editor {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .memory-note-editor label {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 760;
+    }
+
+    .memory-note-editor textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      font: inherit;
+      line-height: 1.6;
+    }
+
+    .memory-note-editor textarea:focus {
+      border-color: rgba(0, 113, 227, 0.5);
+      outline: 3px solid rgba(0, 113, 227, 0.16);
+    }
+
+    .photo-manager-section h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .managed-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .managed-photo {
+      position: relative;
+      overflow: hidden;
+      min-height: 120px;
+      border-radius: 16px;
+      background: #e8eaed;
+    }
+
+    .managed-photo img {
+      width: 100%;
+      height: 100%;
+      min-height: 120px;
+      object-fit: cover;
+    }
+
+    .managed-photo span {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--muted-strong);
+      font-size: 12px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+
+    .managed-photo button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      min-height: 32px;
+      padding: 5px 9px;
+      border: 1px solid rgba(220, 38, 38, 0.22);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #b91c1c;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .detail-photo-grid button {
+      min-height: 120px;
+      overflow: hidden;
+      border: 0;
+      border-radius: 14px;
+      padding: 0;
+      background: #e8eaed;
+      cursor: pointer;
+    }
+
+    .detail-photo-grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .lightbox[hidden] {
+      display: none;
+    }
+
+    .lightbox-frame {
+      position: relative;
+      width: min(1120px, 100%);
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+    }
+
+    .lightbox-image {
+      max-width: 100%;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 18px;
+      background: #111;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
+    }
+
+    .lightbox-caption {
+      min-height: 22px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.82);
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .lightbox-control {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: background-color 180ms ease, transform 180ms ease;
+    }
+
+    .lightbox-control:hover,
+    .lightbox-control:focus-visible {
+      background: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .lightbox-close {
+      top: -6px;
+      right: -6px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .lightbox-prev:hover,
+    .lightbox-prev:focus-visible,
+    .lightbox-next:hover,
+    .lightbox-next:focus-visible {
+      transform: translateY(calc(-50% - 1px));
+    }
+
+    .lightbox-prev {
+      left: -58px;
+    }
+
+    .lightbox-next {
+      right: -58px;
+    }
+
+    @keyframes sectionPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 113, 227, 0.28);
+      }
+      100% {
+        box-shadow: 0 0 0 18px rgba(0, 113, 227, 0);
+      }
+    }
+
+    @media (max-width: 1040px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        align-content: end;
+      }
+
+      .hero-copy {
+        max-width: 760px;
+      }
+
+      .hero-collage {
+        max-width: 640px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: 150px;
+      }
+
+      .hero-card:first-child {
+        grid-row: auto;
+      }
+
+      .place-grid,
+      .timeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .map-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .map-route {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .map-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .lightbox-prev {
+        left: 10px;
+      }
+
+      .lightbox-next {
+        right: 10px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 24px, var(--max-width));
+        margin-top: 12px;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .nav-links a {
+        min-height: 34px;
+        padding: 7px 9px;
+        font-size: 13px;
+      }
+
+      .hero {
+        min-height: 690px;
+        border-radius: 24px;
+      }
+
+      .hero::after {
+        background:
+          linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.72) 78%),
+          linear-gradient(90deg, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.12));
+      }
+
+      .hero-inner {
+        gap: 22px;
+        padding: 26px 20px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .hero-actions {
+        margin-top: 20px;
+      }
+
+      .hero-collage {
+        grid-template-rows: 112px;
+        gap: 8px;
+      }
+
+      .hero-card {
+        border-radius: 16px;
+      }
+
+      .memory-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .memory-stat {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .memory-stat:last-child {
+        border-bottom: 0;
+      }
+
+      .section-head,
+      .album-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .place-grid,
+      .timeline,
+      .map-route,
+      .map-config-grid,
+      .album-cover-card,
+      .cover-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .map-toolbar {
+        grid-template-columns: 1fr auto;
+      }
+
+      .map-toolbar .text-button {
+        grid-column: 1 / -1;
+      }
+
+      .map-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .map-panel,
+      #travel-map,
+      .map-fallback {
+        min-height: 430px;
+      }
+
+      #travel-map {
+        padding-top: 0;
+      }
+
+      .map-sidebar {
+        min-height: auto;
+      }
+
+      .place-detail {
+        padding: 12px;
+      }
+
+      .photo-manager {
+        padding: 12px;
+      }
+
+      .place-detail-card,
+      .photo-manager-card {
+        max-height: calc(100vh - 24px);
+        border-radius: 22px;
+      }
+
+      .place-detail-hero {
+        min-height: 210px;
+        border-radius: 22px 22px 0 0;
+      }
+
+      .place-detail-hero img {
+        min-height: 210px;
+      }
+
+      .cover-button,
+      .cover-button:nth-child(2) {
+        min-height: 320px;
+      }
+
+      .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .photo-button,
+      .photo-button.is-tall,
+      .photo-button.is-wide,
+      .photo-button.is-large {
+        grid-column: auto;
+        grid-row-end: span 24;
+        border-radius: 14px;
+      }
+
+      .photo-button.is-tall,
+      .photo-button.is-large {
+        grid-row-end: span 32;
+      }
+
+      .lightbox {
+        padding: 16px;
+      }
+
+      .lightbox-image {
+        max-height: 78vh;
+        border-radius: 14px;
+      }
+
+      .lightbox-close {
+        top: 8px;
+        right: 8px;
+      }
+
+      .lightbox-prev,
+      .lightbox-next {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .photo-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 7px;
+      }
+
+      .button-link {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+
+      .fade-in {
+        opacity: 1;
+        transform: none;
+      }
+
+      .photo-stack {
+        perspective: none;
+      }
+
+      .photo-stack-card,
+      .photo-stack-card.is-front {
+        box-shadow: 0 16px 36px rgba(22, 24, 29, 0.15);
+        transform: translate3d(calc(-50% + var(--fan-x)), calc(-50% + var(--fan-y)), 0) rotate(var(--fan-rotate));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" id="home">
+    <nav class="nav" aria-label="主导航">
+      <div class="nav-logo">Houxuan × Linsan</div>
+      <div class="nav-links">
+        <a href="#home">首页</a>
+        <a href="#places">足迹</a>
+        <a href="#map-section">地图</a>
+        <a href="#gallery">相册</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <img class="hero-bg" src="picture/sansan/sansan2.jpg" alt="Houxuan 和 Linsan 的相册封面" fetchpriority="high">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="hero-eyebrow">Our memory archive</p>
+          <h1>我们去过的地方</h1>
+          <p>这是我们一起旅行和生活的记录。每一次出发都变成了照片，每一段路都变成了回忆。</p>
+          <div class="hero-actions" aria-label="快捷入口">
+            <a class="button-link" href="#gallery">看照片相册</a>
+            <a class="button-link secondary" href="#map-section">打开足迹地图</a>
+          </div>
+        </div>
+
+        <div class="hero-collage" aria-label="精选照片">
+          <button class="hero-card" type="button" data-lightbox data-caption="封面照片 1">
+            <img src="picture/sansan/sansan1.jpg" alt="封面照片 1" loading="lazy" decoding="async">
+          </button>
+          <button class="hero-card" type="button" data-lightbox data-caption="封面照片 3">
+            <img src="picture/sansan/sansan3.jpg" alt="封面照片 3" loading="lazy" decoding="async">
+          </button>
+          <button class="hero-card" type="button" data-lightbox data-caption="舟山照片 11">
+            <img src="picture/zhoushan/zhoushan11.jpg" alt="舟山照片 11" loading="lazy" decoding="async">
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="memory-strip" aria-label="相册概览">
+      <div class="memory-stat">
+        <strong>6+</strong>
+        <span>重要地点与阶段</span>
+      </div>
+      <div class="memory-stat">
+        <strong>49</strong>
+        <span>已收录照片</span>
+      </div>
+      <div class="memory-stat">
+        <strong>2023 → 2026</strong>
+        <span>持续更新中</span>
+      </div>
+    </div>
+
+    <section class="section fade-in" id="places">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Travel footprints</p>
+          <h2 class="section-title">旅行足迹</h2>
+        </div>
+        <p class="section-subtitle">点击卡片可以直接跳转到对应相册。布局会随屏幕自动适配，手机端也能顺滑浏览。</p>
+      </div>
+
+      <div class="place-grid">
+        <a class="place-card" href="#wuhan">
+          <h3 class="place-name">武汉</h3>
+          <p class="place-meta">2024.12</p>
+          <p class="place-desc">热干面和江滩，四张照片记录初冬旅途。</p>
+        </a>
+        <a class="place-card" href="#chengdu">
+          <h3 class="place-name">成都</h3>
+          <p class="place-meta">2024.12</p>
+          <p class="place-desc">大熊猫、街巷和慢节奏，九张完整城市记忆。</p>
+        </a>
+        <a class="place-card" href="#chongqing">
+          <h3 class="place-name">重庆</h3>
+          <p class="place-meta">2024.12</p>
+          <p class="place-desc">山城夜景和火锅烟火气，四张照片浓缩旅程。</p>
+        </a>
+        <a class="place-card" href="#fall2024">
+          <h3 class="place-name">2024 秋季学期</h3>
+          <p class="place-meta">2024</p>
+          <p class="place-desc">九张校园日常，记录一起成长的阶段。</p>
+        </a>
+        <a class="place-card" href="#taizhou">
+          <h3 class="place-name">台州</h3>
+          <p class="place-meta">2025</p>
+          <p class="place-desc">风景、美食和戏曲体验，四张照片刚好定格。</p>
+        </a>
+        <a class="place-card" href="#zhoushan">
+          <h3 class="place-name">舟山</h3>
+          <p class="place-meta">2025</p>
+          <p class="place-desc">海风和周年纪念，十六张照片构成一整段回忆。</p>
+        </a>
+      </div>
+
+      <ul class="timeline">
+        <li><strong>2024 年冬天：</strong>武汉、成都、重庆三地连线，旅行密度最高的一段时间。</li>
+        <li><strong>2024 秋季学期：</strong>从“去哪里”到“怎么一起生活”，把日常也变成了纪念。</li>
+        <li><strong>2025 年：</strong>台州和舟山，更多海边与纪念日主题的回忆。</li>
+      </ul>
+    </section>
+
+    <section class="section fade-in" id="map-section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Memory map</p>
+          <h2 class="section-title">足迹地图</h2>
+        </div>
+        <p class="section-subtitle">在地图上查看地点、添加新的回忆记录，也可以继续跳转到已有相册。新地点会保存在当前浏览器。</p>
+      </div>
+
+      <div class="map-layout">
+        <div class="map-panel">
+          <div class="map-toolbar" aria-label="地图搜索与添加">
+            <input id="place-search-input" type="search" placeholder="搜索地点，例如 香港大学、上海外滩">
+            <button class="icon-button" type="button" id="place-search-button" aria-label="搜索地点">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m21 21-4.3-4.3m2.3-5.2a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="text-button primary" type="button" id="open-place-form">添加地点</button>
+          </div>
+          <div id="travel-map" aria-label="旅行地图"></div>
+          <div class="map-config-panel" id="amap-config-panel" hidden>
+            <h3>连接高德地图</h3>
+            <p>输入你的高德 Web JSAPI Key 和安全密钥。它们只会保存在当前浏览器，用来加载这张地图。</p>
+            <div class="map-config-grid">
+              <input id="amap-key-input" type="password" autocomplete="off" placeholder="AMap JSAPI Key">
+              <input id="amap-security-input" type="password" autocomplete="off" placeholder="securityJsCode">
+            </div>
+            <div class="form-actions">
+              <button class="text-button primary" type="button" id="save-amap-config">保存并加载地图</button>
+            </div>
+          </div>
+          <div class="map-status" id="map-status" hidden></div>
+        </div>
+        <aside class="map-sidebar" aria-label="地点记录">
+          <div class="map-summary" aria-label="地点统计">
+            <div class="map-summary-item">
+              <strong id="place-count">0</strong>
+              <span>地图地点</span>
+            </div>
+            <div class="map-summary-item">
+              <strong id="map-photo-count">0</strong>
+              <span>关联照片</span>
+            </div>
+            <div class="map-summary-item">
+              <strong id="custom-place-count">0</strong>
+              <span>本地新增</span>
+            </div>
+          </div>
+
+          <form class="place-editor" id="place-form" hidden>
+            <h3 id="place-form-title">添加地点</h3>
+            <p class="form-help">先搜索地点或直接在地图上点击选点，再填写时间、备注和照片。</p>
+            <div class="search-results" id="place-search-results" aria-live="polite"></div>
+            <div class="form-grid">
+              <input type="hidden" id="place-id">
+              <label>
+                地点名称
+                <input id="place-name" type="text" required placeholder="例如 香港大学">
+              </label>
+              <label>
+                时间
+                <input id="place-time" type="text" required placeholder="例如 2026年9月 / 2026-09-01">
+              </label>
+              <label>
+                地图位置
+                <input id="place-location-label" type="text" required placeholder="搜索或点击地图选择位置">
+              </label>
+              <label>
+                备注
+                <textarea id="place-note" placeholder="写下一句话，记录当时的感受。"></textarea>
+              </label>
+              <label>
+                上传照片
+                <input id="place-photos" type="file" accept="image/*" multiple>
+              </label>
+              <div>
+                <p class="form-help">标签</p>
+                <div class="tag-options" aria-label="地点标签">
+                  <label><input type="checkbox" name="place-tags" value="旅行">旅行</label>
+                  <label><input type="checkbox" name="place-tags" value="学习">学习</label>
+                  <label><input type="checkbox" name="place-tags" value="生活">生活</label>
+                  <label><input type="checkbox" name="place-tags" value="纪念">纪念</label>
+                </div>
+              </div>
+            </div>
+            <p class="form-help" id="selected-location-help">还没有选择地图位置。</p>
+            <div class="form-actions">
+              <button class="text-button primary" type="submit">保存地点</button>
+              <button class="text-button" type="button" id="cancel-place-form">取消</button>
+              <button class="text-button danger" type="button" id="delete-place-button" hidden>删除</button>
+            </div>
+          </form>
+
+          <div class="place-list-head">
+            <h3>地点列表</h3>
+            <button class="text-button" type="button" id="fit-map-button">显示全部</button>
+          </div>
+          <div class="map-route" id="place-list" aria-label="地图地点列表"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section fade-in">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Opening frames</p>
+          <h2 class="section-title">精选封面</h2>
+        </div>
+        <p class="section-subtitle">三张封面照，作为这份相册的开场。</p>
+      </div>
+
+      <div class="cover-grid">
+        <button class="cover-button" type="button" data-lightbox data-caption="封面照片 1">
+          <img src="picture/sansan/sansan1.jpg" alt="封面照片 1" loading="lazy" decoding="async">
+        </button>
+        <button class="cover-button" type="button" data-lightbox data-caption="封面照片 2">
+          <img src="picture/sansan/sansan2.jpg" alt="封面照片 2" loading="lazy" decoding="async">
+        </button>
+        <button class="cover-button" type="button" data-lightbox data-caption="封面照片 3">
+          <img src="picture/sansan/sansan3.jpg" alt="封面照片 3" loading="lazy" decoding="async">
+        </button>
+      </div>
+    </section>
+
+    <section class="section fade-in" id="gallery">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Photo albums</p>
+          <h2 class="section-title">照片相册</h2>
+        </div>
+        <p class="section-subtitle">按地点和阶段分组，保留了你仓库里的全部原始图片。点击任意照片可以打开大图预览。</p>
+      </div>
+
+      <article class="album-block" id="wuhan">
+        <div class="album-header">
+          <h3>武汉</h3>
+          <span>2024.12 · 4 张</span>
+        </div>
+        <p>一次冬季旅程的开篇。</p>
+        <div class="photo-grid">
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="武汉照片 1"><img src="picture/wuhan/wuhan1.jpg" alt="武汉照片 1" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="武汉照片 2"><img src="picture/wuhan/wuhan2.jpg" alt="武汉照片 2" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="武汉照片 3"><img src="picture/wuhan/wuhan3.jpg" alt="武汉照片 3" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="武汉照片 4"><img src="picture/wuhan/wuhan4.jpg" alt="武汉照片 4" loading="lazy" decoding="async"></button>
+        </div>
+      </article>
+
+      <article class="album-block" id="chengdu">
+        <div class="album-header">
+          <h3>成都</h3>
+          <span>2024.12 · 9 张</span>
+        </div>
+        <p>慢节奏城市，九张完整记录。</p>
+        <div class="photo-grid">
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="成都照片 1"><img src="picture/chengdu/wuhan1.jpg" alt="成都照片 1" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="成都照片 2"><img src="picture/chengdu/wuhan2.jpg" alt="成都照片 2" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="成都照片 3"><img src="picture/chengdu/wuhan3.jpg" alt="成都照片 3" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="成都照片 4"><img src="picture/chengdu/wuhan4.jpg" alt="成都照片 4" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="成都照片 5"><img src="picture/chengdu/wuhan5.jpg" alt="成都照片 5" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="成都照片 6"><img src="picture/chengdu/wuhan6.jpg" alt="成都照片 6" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="成都照片 7"><img src="picture/chengdu/wuhan7.jpg" alt="成都照片 7" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="成都照片 8"><img src="picture/chengdu/wuhan8.jpg" alt="成都照片 8" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="成都照片 9"><img src="picture/chengdu/wuhan9.jpg" alt="成都照片 9" loading="lazy" decoding="async"></button>
+        </div>
+      </article>
+
+      <article class="album-block" id="chongqing">
+        <div class="album-header">
+          <h3>重庆</h3>
+          <span>2024.12 · 4 张</span>
+        </div>
+        <p>火锅、山城、夜色和人间烟火。</p>
+        <div class="photo-grid">
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="重庆照片 1"><img src="picture/chongqing/chongqing1.jpg" alt="重庆照片 1" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="重庆照片 2"><img src="picture/chongqing/chongqing2.jpg" alt="重庆照片 2" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="重庆照片 3"><img src="picture/chongqing/chongqing3.jpg" alt="重庆照片 3" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="重庆照片 4"><img src="picture/chongqing/chongqing4.jpg" alt="重庆照片 4" loading="lazy" decoding="async"></button>
+        </div>
+      </article>
+
+      <article class="album-block" id="fall2024">
+        <div class="album-header">
+          <h3>2024 秋季学期</h3>
+          <span>2024 · 9 张</span>
+        </div>
+        <p>把普通日常过成值得收藏的时间段。</p>
+        <div class="photo-grid">
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="2024 秋季学期照片 1"><img src="picture/24fallsemester/24fallsemester1.jpg" alt="2024 秋季学期照片 1" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="2024 秋季学期照片 2"><img src="picture/24fallsemester/24fallsemester2.jpg" alt="2024 秋季学期照片 2" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="2024 秋季学期照片 3"><img src="picture/24fallsemester/24fallsemester3.jpg" alt="2024 秋季学期照片 3" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="2024 秋季学期照片 4"><img src="picture/24fallsemester/24fallsemester4.jpg" alt="2024 秋季学期照片 4" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="2024 秋季学期照片 5"><img src="picture/24fallsemester/24fallsemester5.jpg" alt="2024 秋季学期照片 5" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="2024 秋季学期照片 6"><img src="picture/24fallsemester/24fallsemester6.jpg" alt="2024 秋季学期照片 6" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="2024 秋季学期照片 7"><img src="picture/24fallsemester/24fallsemester7.jpg" alt="2024 秋季学期照片 7" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="2024 秋季学期照片 8"><img src="picture/24fallsemester/24fallsemester8.jpg" alt="2024 秋季学期照片 8" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="2024 秋季学期照片 9"><img src="picture/24fallsemester/24fallsemester9.jpg" alt="2024 秋季学期照片 9" loading="lazy" decoding="async"></button>
+        </div>
+      </article>
+
+      <article class="album-block" id="taizhou">
+        <div class="album-header">
+          <h3>台州</h3>
+          <span>2025 · 4 张</span>
+        </div>
+        <p>风景与美食兼具，旅行节奏很舒服。</p>
+        <div class="photo-grid">
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="台州照片 1"><img src="picture/taizhou/taizhou1.jpg" alt="台州照片 1" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="台州照片 2"><img src="picture/taizhou/taizhou2.jpg" alt="台州照片 2" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="台州照片 3"><img src="picture/taizhou/taizhou3.jpg" alt="台州照片 3" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="台州照片 4"><img src="picture/taizhou/taizhou4.jpg" alt="台州照片 4" loading="lazy" decoding="async"></button>
+        </div>
+      </article>
+
+      <article class="album-block" id="zhoushan">
+        <div class="album-header">
+          <h3>舟山</h3>
+          <span>2025 · 16 张</span>
+        </div>
+        <p>海边与纪念日主题，最完整的一组记忆。</p>
+        <div class="photo-grid">
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="舟山照片 1"><img src="picture/zhoushan/zhoushan1.jpg" alt="舟山照片 1" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="舟山照片 2"><img src="picture/zhoushan/zhoushan2.jpg" alt="舟山照片 2" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 3"><img src="picture/zhoushan/zhoushan3.jpg" alt="舟山照片 3" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="舟山照片 4"><img src="picture/zhoushan/zhoushan4.jpg" alt="舟山照片 4" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 5"><img src="picture/zhoushan/zhoushan5.jpg" alt="舟山照片 5" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="舟山照片 6"><img src="picture/zhoushan/zhoushan6.jpg" alt="舟山照片 6" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 7"><img src="picture/zhoushan/zhoushan7.jpg" alt="舟山照片 7" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="舟山照片 8"><img src="picture/zhoushan/zhoushan8.jpg" alt="舟山照片 8" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 9"><img src="picture/zhoushan/zhoushan9.jpg" alt="舟山照片 9" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-wide" type="button" data-lightbox data-caption="舟山照片 10"><img src="picture/zhoushan/zhoushan10.jpg" alt="舟山照片 10" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="舟山照片 11"><img src="picture/zhoushan/zhoushan11.jpg" alt="舟山照片 11" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 12"><img src="picture/zhoushan/zhoushan12.jpg" alt="舟山照片 12" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-large" type="button" data-lightbox data-caption="舟山照片 13"><img src="picture/zhoushan/zhoushan13.jpg" alt="舟山照片 13" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 14"><img src="picture/zhoushan/zhoushan14.jpg" alt="舟山照片 14" loading="lazy" decoding="async"></button>
+          <button class="photo-button is-tall" type="button" data-lightbox data-caption="舟山照片 15"><img src="picture/zhoushan/zhoushan15.jpg" alt="舟山照片 15" loading="lazy" decoding="async"></button>
+          <button class="photo-button" type="button" data-lightbox data-caption="舟山照片 16"><img src="picture/zhoushan/zhoushan16.jpg" alt="舟山照片 16" loading="lazy" decoding="async"></button>
+        </div>
+      </article>
+
+      <div class="custom-albums" id="custom-albums"></div>
+    </section>
+
+    <p class="footer">Made with love · Houxuan & Linsan</p>
+  </div>
+
+  <div class="place-detail" id="place-detail" role="dialog" aria-modal="true" aria-label="地点详情" hidden>
+    <div class="place-detail-card">
+      <div class="place-detail-hero" id="place-detail-hero"></div>
+      <div class="place-detail-body">
+        <div class="place-detail-head">
+          <div>
+            <p class="eyebrow">Place detail</p>
+            <h3 id="place-detail-title"></h3>
+          </div>
+          <button class="icon-button place-detail-close" type="button" id="close-place-detail" aria-label="关闭地点详情">&times;</button>
+        </div>
+        <div class="place-detail-meta" id="place-detail-meta"></div>
+        <p class="place-detail-note" id="place-detail-note"></p>
+        <div class="detail-photo-grid" id="place-detail-photos"></div>
+        <div class="detail-actions" id="place-detail-actions"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="photo-manager" id="photo-manager" role="dialog" aria-modal="true" aria-label="编辑回忆" hidden>
+    <div class="photo-manager-card">
+      <div class="photo-manager-head">
+        <div>
+          <p class="eyebrow">Memory editor</p>
+          <h3 id="photo-manager-title">编辑回忆</h3>
+        </div>
+        <button class="icon-button" type="button" id="close-photo-manager" aria-label="关闭编辑回忆">&times;</button>
+      </div>
+      <div class="photo-manager-body">
+        <div class="memory-note-editor">
+          <label for="memory-note-input">地点描述</label>
+          <textarea id="memory-note-input" maxlength="220" placeholder="写下这段回忆里最想留下的话。"></textarea>
+          <p class="form-help" id="memory-note-help">描述只保存在当前浏览器，不会修改原始照片和地点资料。</p>
+          <div class="form-actions">
+            <button class="text-button primary" type="button" id="save-memory-note">保存描述</button>
+            <button class="text-button" type="button" id="reset-memory-note">恢复原描述</button>
+          </div>
+        </div>
+        <div class="photo-manager-upload">
+          <p class="form-help">上传的照片会压缩后保存在当前浏览器，不会写入项目里的原始图片文件。</p>
+          <input id="photo-manager-input" type="file" accept="image/*" multiple>
+          <div class="form-actions">
+            <button class="text-button primary" type="button" id="upload-managed-photos">上传照片</button>
+          </div>
+        </div>
+        <section class="photo-manager-section">
+          <h4>本地上传照片</h4>
+          <div class="managed-photo-grid" id="managed-uploaded-photos"></div>
+        </section>
+        <section class="photo-manager-section">
+          <h4>原始相册照片</h4>
+          <div class="managed-photo-grid" id="managed-original-photos"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="照片预览" hidden>
+    <div class="lightbox-frame">
+      <button class="lightbox-control lightbox-close" type="button" aria-label="关闭预览">&times;</button>
+      <button class="lightbox-control lightbox-prev" type="button" aria-label="上一张">&#8249;</button>
+      <img class="lightbox-image" alt="">
+      <button class="lightbox-control lightbox-next" type="button" aria-label="下一张">&#8250;</button>
+      <p class="lightbox-caption"></p>
+    </div>
+  </div>
+
+  <script src="https://webapi.amap.com/loader.js"></script>
+  <script>
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const AMAP_CONFIG_STORAGE_KEY = "memoryMap.amapConfig.v1";
+    const CUSTOM_PLACES_STORAGE_KEY = "memoryMap.customPlaces.v1";
+    const PHOTO_OVERRIDES_STORAGE_KEY = "memoryMap.placePhotoOverrides.v1";
+    const NOTE_OVERRIDES_STORAGE_KEY = "memoryMap.placeNoteOverrides.v1";
+
+    if (!prefersReducedMotion && "IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.01 });
+
+      document.querySelectorAll(".fade-in").forEach((el) => observer.observe(el));
+    } else {
+      document.querySelectorAll(".fade-in").forEach((el) => el.classList.add("visible"));
+    }
+
+    const builtInPlaces = [
+      {
+        id: "wuhan",
+        name: "武汉",
+        city: "武汉",
+        country: "中国",
+        position: [114.3055, 30.5928],
+        time: "2024.12",
+        detail: "初冬旅程",
+        note: "一次冬季旅程的开篇。",
+        tags: ["旅行"],
+        sectionId: "wuhan",
+        readonly: true,
+        photos: [
+          "picture/wuhan/wuhan1.jpg",
+          "picture/wuhan/wuhan2.jpg",
+          "picture/wuhan/wuhan3.jpg",
+          "picture/wuhan/wuhan4.jpg"
+        ]
+      },
+      {
+        id: "chengdu",
+        name: "成都",
+        city: "成都",
+        country: "中国",
+        position: [104.0668, 30.5728],
+        time: "2024.12",
+        detail: "熊猫与慢生活",
+        note: "慢节奏城市，九张完整记录。",
+        tags: ["旅行", "生活"],
+        sectionId: "chengdu",
+        readonly: true,
+        photos: [
+          "picture/chengdu/wuhan1.jpg",
+          "picture/chengdu/wuhan2.jpg",
+          "picture/chengdu/wuhan3.jpg",
+          "picture/chengdu/wuhan4.jpg",
+          "picture/chengdu/wuhan5.jpg",
+          "picture/chengdu/wuhan6.jpg",
+          "picture/chengdu/wuhan7.jpg",
+          "picture/chengdu/wuhan8.jpg",
+          "picture/chengdu/wuhan9.jpg"
+        ]
+      },
+      {
+        id: "chongqing",
+        name: "重庆",
+        city: "重庆",
+        country: "中国",
+        position: [106.5516, 29.563],
+        time: "2024.12",
+        detail: "山城夜景",
+        note: "火锅、山城、夜色和人间烟火。",
+        tags: ["旅行"],
+        sectionId: "chongqing",
+        readonly: true,
+        photos: [
+          "picture/chongqing/chongqing1.jpg",
+          "picture/chongqing/chongqing2.jpg",
+          "picture/chongqing/chongqing3.jpg",
+          "picture/chongqing/chongqing4.jpg"
+        ]
+      },
+      {
+        id: "fall2024",
+        name: "2024 秋季学期",
+        city: "",
+        country: "中国",
+        position: null,
+        time: "2024",
+        detail: "校园日常",
+        note: "把普通日常过成值得收藏的时间段。",
+        tags: ["生活", "纪念"],
+        sectionId: "fall2024",
+        readonly: true,
+        photos: [
+          "picture/24fallsemester/24fallsemester1.jpg",
+          "picture/24fallsemester/24fallsemester2.jpg",
+          "picture/24fallsemester/24fallsemester3.jpg",
+          "picture/24fallsemester/24fallsemester4.jpg",
+          "picture/24fallsemester/24fallsemester5.jpg",
+          "picture/24fallsemester/24fallsemester6.jpg",
+          "picture/24fallsemester/24fallsemester7.jpg",
+          "picture/24fallsemester/24fallsemester8.jpg",
+          "picture/24fallsemester/24fallsemester9.jpg"
+        ]
+      },
+      {
+        id: "taizhou",
+        name: "台州",
+        city: "台州",
+        country: "中国",
+        position: [121.4208, 28.6569],
+        time: "2025",
+        detail: "风景与美食",
+        note: "风景与美食兼具，旅行节奏很舒服。",
+        tags: ["旅行", "生活"],
+        sectionId: "taizhou",
+        readonly: true,
+        photos: [
+          "picture/taizhou/taizhou1.jpg",
+          "picture/taizhou/taizhou2.jpg",
+          "picture/taizhou/taizhou3.jpg",
+          "picture/taizhou/taizhou4.jpg"
+        ]
+      },
+      {
+        id: "zhoushan",
+        name: "舟山",
+        city: "舟山",
+        country: "中国",
+        position: [122.2072, 29.9853],
+        time: "2025",
+        detail: "海边纪念",
+        note: "海边与纪念日主题，最完整的一组记忆。",
+        tags: ["旅行", "纪念"],
+        sectionId: "zhoushan",
+        readonly: true,
+        photos: [
+          "picture/zhoushan/zhoushan1.jpg",
+          "picture/zhoushan/zhoushan2.jpg",
+          "picture/zhoushan/zhoushan3.jpg",
+          "picture/zhoushan/zhoushan4.jpg",
+          "picture/zhoushan/zhoushan5.jpg",
+          "picture/zhoushan/zhoushan6.jpg",
+          "picture/zhoushan/zhoushan7.jpg",
+          "picture/zhoushan/zhoushan8.jpg",
+          "picture/zhoushan/zhoushan9.jpg",
+          "picture/zhoushan/zhoushan10.jpg",
+          "picture/zhoushan/zhoushan11.jpg",
+          "picture/zhoushan/zhoushan12.jpg",
+          "picture/zhoushan/zhoushan13.jpg",
+          "picture/zhoushan/zhoushan14.jpg",
+          "picture/zhoushan/zhoushan15.jpg",
+          "picture/zhoushan/zhoushan16.jpg"
+        ]
+      }
+    ];
+
+    const mapState = {
+      AMap: null,
+      map: null,
+      infoWindow: null,
+      markers: new Map(),
+      pendingMarker: null,
+      placeSearch: null,
+      selectedLocation: null,
+      photoManagerPlaceId: "",
+      loading: false
+    };
+
+    const qs = (selector, root = document) => root.querySelector(selector);
+    const qsa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    const escapeHtml = (value = "") => String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll("\"", "&quot;")
+      .replaceAll("'", "&#039;");
+
+    const basePhotoObjects = (place) => (place.photos || []).map((photo, index) => {
+      if (typeof photo === "string") {
+        return { id: `base-${index}`, src: photo, caption: `${place.name}照片 ${index + 1}`, source: "base" };
+      }
+      return {
+        id: photo.id || `base-${index}`,
+        src: photo.src,
+        caption: photo.caption || `${place.name}照片 ${index + 1}`,
+        source: "base"
+      };
+    }).filter((photo) => photo.src);
+
+    const getPhotoOverridesMap = () => {
+      try {
+        return JSON.parse(localStorage.getItem(PHOTO_OVERRIDES_STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    };
+
+    const savePhotoOverridesMap = (overrides) => {
+      localStorage.setItem(PHOTO_OVERRIDES_STORAGE_KEY, JSON.stringify(overrides));
+    };
+
+    const getPhotoOverrides = (placeId) => {
+      const overrides = getPhotoOverridesMap();
+      return Array.isArray(overrides[placeId]) ? overrides[placeId] : [];
+    };
+
+    const setPhotoOverrides = (placeId, photos) => {
+      const overrides = getPhotoOverridesMap();
+      if (photos.length) {
+        overrides[placeId] = photos;
+      } else {
+        delete overrides[placeId];
+      }
+      savePhotoOverridesMap(overrides);
+    };
+
+    const getNoteOverridesMap = () => {
+      try {
+        return JSON.parse(localStorage.getItem(NOTE_OVERRIDES_STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    };
+
+    const saveNoteOverridesMap = (overrides) => {
+      localStorage.setItem(NOTE_OVERRIDES_STORAGE_KEY, JSON.stringify(overrides));
+    };
+
+    const getNoteOverride = (placeId) => {
+      const overrides = getNoteOverridesMap();
+      return Object.prototype.hasOwnProperty.call(overrides, placeId) ? overrides[placeId] : null;
+    };
+
+    const setNoteOverride = (placeId, note) => {
+      const overrides = getNoteOverridesMap();
+      overrides[placeId] = {
+        note,
+        updatedAt: new Date().toISOString()
+      };
+      saveNoteOverridesMap(overrides);
+    };
+
+    const clearNoteOverride = (placeId) => {
+      const overrides = getNoteOverridesMap();
+      delete overrides[placeId];
+      saveNoteOverridesMap(overrides);
+    };
+
+    const basePlaceNote = (place) => place.note || place.detail || "";
+
+    const effectivePlaceNote = (place) => {
+      const override = getNoteOverride(place.id);
+      return override && typeof override.note === "string" ? override.note : basePlaceNote(place);
+    };
+
+    const photoObjects = (place) => [
+      ...basePhotoObjects(place),
+      ...getPhotoOverrides(place.id).map((photo, index) => ({
+        id: photo.id || `uploaded-${index}`,
+        src: photo.src,
+        caption: photo.caption || `${place.name}上传照片 ${index + 1}`,
+        source: "uploaded",
+        createdAt: photo.createdAt || ""
+      }))
+    ].filter((photo) => photo.src);
+
+    const getCover = (place) => {
+      const photos = photoObjects(place);
+      return photos.find((photo) => photo.src === place.cover)?.src || photos[0]?.src || "";
+    };
+
+    const createPhotoStackHTML = (place, options = {}) => {
+      const photos = photoObjects(place).slice(0, 5);
+      const label = options.label || `${place.name}照片堆叠`;
+      const className = options.className ? ` ${options.className}` : "";
+      if (!photos.length) {
+        return `
+          <button class="photo-stack is-empty${className}" type="button" data-manage-photos="${escapeHtml(place.id)}" aria-label="${escapeHtml(label)}">
+            <span class="photo-stack-empty">还没有照片<br>点击上传</span>
+          </button>
+        `;
+      }
+
+      return `
+        <div class="photo-stack${className}" data-photo-stack role="group" aria-label="${escapeHtml(label)}">
+          ${photos.map((photo, index) => {
+            const middle = (photos.length - 1) / 2;
+            const offset = index - middle;
+            const fanX = `${(offset * 11).toFixed(1)}%`;
+            const fanY = `${Math.abs(offset) * 7}px`;
+            const rotate = `${(offset * 5.5).toFixed(1)}deg`;
+            return `
+            <button
+              class="photo-stack-card"
+              type="button"
+              data-stack-card
+              data-stack-index="${index}"
+              style="--fan-x: ${fanX}; --fan-y: ${fanY}; --fan-rotate: ${rotate}; --fan-z: ${index + 1};"
+              aria-label="${escapeHtml(photo.caption)}，设为前景"
+            >
+              <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.caption)}" loading="lazy" decoding="async">
+            </button>
+          `;
+          }).join("")}
+        </div>
+      `;
+    };
+
+    const createAlbumCoverHTML = (place) => {
+      const photos = photoObjects(place);
+      const tags = place.tags.map((tag) => `<span class="place-tag">${escapeHtml(tag)}</span>`).join("");
+      const targetId = place.sectionId || `album-${place.id}`;
+      return `
+        <div class="album-cover-card" data-album-cover="${escapeHtml(place.id)}">
+          ${createPhotoStackHTML(place)}
+          <div class="album-cover-content">
+            <div>
+              <p class="eyebrow">Memory album</p>
+              <h4>${escapeHtml(place.name)}</h4>
+            </div>
+            <p>${escapeHtml(place.time || "未填写时间")} · ${photos.length} 张照片</p>
+            <p>${escapeHtml(effectivePlaceNote(place) || "还没有备注。")}</p>
+            <div class="map-chip-meta">${tags}</div>
+            <div class="album-cover-actions">
+              <button class="text-button primary" type="button" data-toggle-album="${escapeHtml(targetId)}" aria-expanded="false">查看照片墙</button>
+              <button class="text-button" type="button" data-manage-photos="${escapeHtml(place.id)}">编辑回忆</button>
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    const normalizePlace = (place) => ({
+      id: place.id || `custom-${Date.now()}`,
+      name: place.name || "未命名地点",
+      city: place.city || "",
+      country: place.country || "中国",
+      address: place.address || "",
+      position: Array.isArray(place.position) ? place.position.map(Number) : null,
+      time: place.time || "",
+      detail: place.detail || "",
+      note: place.note || "",
+      tags: Array.isArray(place.tags) ? place.tags : [],
+      photos: Array.isArray(place.photos) ? place.photos : [],
+      cover: place.cover || "",
+      sectionId: place.sectionId || "",
+      readonly: Boolean(place.readonly),
+      createdAt: place.createdAt || new Date().toISOString(),
+      updatedAt: place.updatedAt || new Date().toISOString()
+    });
+
+    const getStoredPlaces = () => {
+      try {
+        const raw = localStorage.getItem(CUSTOM_PLACES_STORAGE_KEY);
+        if (!raw) return [];
+        return JSON.parse(raw).map(normalizePlace);
+      } catch {
+        return [];
+      }
+    };
+
+    let customPlaces = getStoredPlaces();
+
+    const saveStoredPlaces = () => {
+      localStorage.setItem(CUSTOM_PLACES_STORAGE_KEY, JSON.stringify(customPlaces));
+    };
+
+    const getAllPlaces = () => [
+      ...builtInPlaces.map(normalizePlace),
+      ...customPlaces.map(normalizePlace)
+    ];
+
+    const findPlace = (id) => getAllPlaces().find((place) => place.id === id);
+
+    const scrollToAlbum = (sectionId) => {
+      const target = document.getElementById(sectionId);
+      if (!target) return;
+      target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+      target.classList.remove("focus-target");
+      setTimeout(() => target.classList.add("focus-target"), 20);
+      setTimeout(() => target.classList.remove("focus-target"), 1100);
+    };
+
+    const setStatus = (message, persist = false) => {
+      const status = qs("#map-status");
+      if (!status) return;
+      status.textContent = message;
+      status.hidden = !message;
+      if (message && !persist) {
+        window.clearTimeout(setStatus.timer);
+        setStatus.timer = window.setTimeout(() => {
+          status.hidden = true;
+        }, 3200);
+      }
+    };
+
+    const getAmapConfig = () => {
+      try {
+        return JSON.parse(localStorage.getItem(AMAP_CONFIG_STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    };
+
+    const hasAmapConfig = () => {
+      const config = getAmapConfig();
+      return Boolean(config.key && config.securityJsCode);
+    };
+
+    const renderAmapConfigPanel = () => {
+      const panel = qs("#amap-config-panel");
+      if (!panel) return;
+      const config = getAmapConfig();
+      qs("#amap-key-input").value = config.key || "";
+      qs("#amap-security-input").value = config.securityJsCode || "";
+      panel.hidden = hasAmapConfig();
+    };
+
+    const initTravelMap = async () => {
+      const mapEl = document.getElementById("travel-map");
+      if (!mapEl) return;
+
+      renderAmapConfigPanel();
+
+      if (!hasAmapConfig()) {
+        mapEl.innerHTML = "<div class=\"map-fallback\">输入高德地图 API 后，这里会显示可交互的回忆地图。</div>";
+        setStatus("");
+        return;
+      }
+
+      if (mapState.loading) return;
+      mapState.loading = true;
+      mapEl.innerHTML = "";
+      setStatus("正在加载高德地图...", true);
+
+      const config = getAmapConfig();
+      window._AMapSecurityConfig = {
+        securityJsCode: config.securityJsCode
+      };
+
+      try {
+        if (typeof AMapLoader === "undefined") {
+          throw new Error("AMapLoader 未加载");
         }
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333333;
-}
+        const AMap = await AMapLoader.load({
+          key: config.key,
+          version: "2.0",
+          plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.PlaceSearch", "AMap.AutoComplete"]
+        });
 
-li {
-  float: left;
-  size: 20px;
+        AMap.getConfig().appname = "amap-jsapi-skill";
 
-}
+        mapState.AMap = AMap;
+        mapState.map = new AMap.Map("travel-map", {
+          viewMode: "3D",
+          zoom: 5,
+          center: [111.2, 30.4],
+          pitch: 0,
+          rotation: 0,
+          mapStyle: "amap://styles/whitesmoke",
+          zooms: [3, 18],
+          resizeEnable: true
+        });
 
-li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 26px;
-  text-decoration: none;
-}
+        mapState.map.addControl(new AMap.Scale());
+        mapState.map.addControl(new AMap.ToolBar({ position: "RB" }));
+        mapState.infoWindow = new AMap.InfoWindow({
+          isCustom: true,
+          autoMove: true,
+          closeWhenClickMap: true,
+          offset: new AMap.Pixel(0, -40)
+        });
+        mapState.placeSearch = new AMap.PlaceSearch({
+          pageSize: 6,
+          pageIndex: 1,
+          city: "全国",
+          extensions: "base"
+        });
 
-li a:hover {
-  background-color: #111111;
-}
+        try {
+          const autoComplete = new AMap.AutoComplete({
+            city: "全国",
+            input: "place-search-input"
+          });
+          autoComplete.on("select", (event) => {
+            const name = event.poi?.name || qs("#place-search-input").value;
+            if (name) searchPlace(name);
+          });
+        } catch {
+          // AutoComplete is optional; keyword search still works.
+        }
 
-.city {
-  background-color: tomato;
-  color: white;
-  border: 2px solid black;
-  margin: 20px;
-  padding: 20px;}
-    </style>
+        mapState.map.on("click", (event) => {
+          if (qs("#place-form").hidden) return;
+          setSelectedLocation(
+            [event.lnglat.lng, event.lnglat.lat],
+            "",
+            `地图选点 ${event.lnglat.lng.toFixed(5)}, ${event.lnglat.lat.toFixed(5)}`
+          );
+        });
 
+        renderMapMarkers();
+        setStatus("");
+      } catch (error) {
+        console.error(error);
+        mapEl.innerHTML = "<div class=\"map-fallback\">高德地图加载失败。请检查 Key、安全密钥和网络。</div>";
+        qs("#amap-config-panel").hidden = false;
+        setStatus("地图加载失败，请检查高德 API 配置。", true);
+      } finally {
+        mapState.loading = false;
+      }
+    };
 
-    <head style="font-size: large;text-align: center;">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="author" content="houxuan zhang">
+    const createMarkerContent = (place) => `
+      <div class="amap-place-marker${place.readonly ? "" : " is-custom"}">
+        <span></span>
+        <strong>${escapeHtml(place.name)}</strong>
+      </div>
+    `;
 
-        <!-- picture memory -->
-        <title id="myHeader">
-            小郭小张的照片记忆
-        </title>
-        <button onclick="displayResult()">点击试一试呗</button>
+    const createInfoWindowContent = (place) => {
+      const tags = place.tags.map((tag) => `<span class="place-tag">${escapeHtml(tag)}</span>`).join("");
+      return `
+        <div class="amap-info-window">
+          ${createPhotoStackHTML(place, { className: "is-map-card" })}
+          <h3>${escapeHtml(place.name)}</h3>
+          <p>${escapeHtml(place.time || "未填写时间")} · ${photoObjects(place).length} 张照片</p>
+          <p>${escapeHtml(effectivePlaceNote(place) || "还没有备注。")}</p>
+          <div class="map-chip-meta">${tags}</div>
+          <div class="info-actions">
+            <button class="text-button primary" type="button" data-view-place="${escapeHtml(place.id)}">查看详情</button>
+            ${place.sectionId ? `<button class="text-button" type="button" data-scroll-album="${escapeHtml(place.sectionId)}">相册</button>` : ""}
+            <button class="text-button" type="button" data-manage-photos="${escapeHtml(place.id)}">编辑回忆</button>
+          </div>
+        </div>
+      `;
+    };
 
-<script>
-function displayResult() {
-  document.getElementById("myHeader").innerHTML = "嘿嘿你终于来了，快来看看吧!";
-}
-</script>
-    </head>
-    <body>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#news">News</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#about">About</a></li>
-          </ul>
+    const openInfoWindow = (place) => {
+      if (!mapState.map || !mapState.infoWindow || !place.position) return;
+      mapState.infoWindow.setContent(createInfoWindowContent(place));
+      mapState.infoWindow.open(mapState.map, place.position);
+    };
 
-    <h1 style="text-align: center; font-size: 60px; font-family: Verdana, Geneva, Tahoma, sans-serif;">  Houxuan <i style="color: brown;">
-      <b>Zhang</b></i> and Linsan <i style="color: bisque;"><b>Guo</b></i></h1>
-    <h2 style="color:darkslategray; text-align: center; font-size: 60px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
-        我们的照片
+    const renderMapMarkers = () => {
+      if (!mapState.map || !mapState.AMap) return;
+      mapState.markers.forEach((marker) => marker.setMap(null));
+      mapState.markers.clear();
 
-    </h2>
+      const AMap = mapState.AMap;
+      const markers = getAllPlaces()
+        .filter((place) => Array.isArray(place.position))
+        .map((place) => {
+          const marker = new AMap.Marker({
+            position: place.position,
+            title: place.name,
+            content: createMarkerContent(place),
+            offset: new AMap.Pixel(-20, -42)
+          });
+          marker.on("click", () => openInfoWindow(place));
+          mapState.map.add(marker);
+          mapState.markers.set(place.id, marker);
+          return marker;
+        });
 
+      if (markers.length) {
+        try {
+          mapState.map.setFitView(markers, false, [86, 64, 72, 64]);
+        } catch {
+          mapState.map.setZoomAndCenter(5, [111.2, 30.4]);
+        }
+      }
+    };
 
-    <table>
-        <caption class="fontstyle" >点击地点跳转</caption>
-        <tr>
-            <th>地点</th>
-            <th>时间</th>
-        </tr>
-        <tr>
-            <td> <p><a href="#wuhan"><em>武汉</em></a></p></td>
-            <td>2024.12</td>
-        </tr>
-        <tr>
-          <td> <p><a href="#chendu"><em>成都</em></a></p></td>
-          <td>2024.12</td>
-      </tr>
-      <tr>
-        <td> <p><a href="#chongqing"><em>重庆</em></a></p></td>
-        <td>2024.12</td>
-    </tr>    
-    <tr>
-      <td> <p><a href="#24fallsemester"><em>24秋季学期</em></a></p></td>
-      <td>2024.12</td>
-  </tr>
-  <tr>
-    <td> <p><a href="#zhoushan"><em>舟山</em></a></p></td>
-    <td>2024.12</td>
-</tr>
-      
-        
-    </table>
+    const focusPlaceOnMap = (placeId) => {
+      const place = findPlace(placeId);
+      if (!place) return;
+      if (mapState.map && place.position) {
+        mapState.map.setZoomAndCenter(8, place.position, false, prefersReducedMotion ? 0 : 700);
+        openInfoWindow(place);
+      }
+      if (place.sectionId) {
+        scrollToAlbum(place.sectionId);
+      } else {
+        openPlaceDetail(place.id);
+      }
+    };
 
-    
+    const fitAllPlaces = () => {
+      if (!mapState.map) return;
+      const markers = Array.from(mapState.markers.values());
+      if (markers.length) {
+        mapState.map.setFitView(markers, false, [86, 64, 72, 64]);
+      }
+    };
 
+    const renderPlaceList = () => {
+      const list = qs("#place-list");
+      if (!list) return;
+      const places = getAllPlaces();
+      list.innerHTML = places.map((place) => {
+        const tags = place.tags.map((tag) => `<span class="place-tag">${escapeHtml(tag)}</span>`).join("");
+        return `
+          <button class="map-chip" type="button" data-focus-place="${escapeHtml(place.id)}">
+            ${escapeHtml(place.name)}
+            <small>${escapeHtml(place.time || "未填写时间")} · ${photoObjects(place).length} 张照片</small>
+            <span class="map-chip-note">${escapeHtml(effectivePlaceNote(place) || "还没有备注。")}</span>
+            <span class="map-chip-meta">${tags}${place.readonly ? "" : "<span class=\"place-tag\">本地</span>"}</span>
+          </button>
+        `;
+      }).join("");
 
-    <!-- <p><a href="#wuhan">Go to <em>武汉</em></a></p> -->
+      qs("#place-count").textContent = places.length;
+      qs("#map-photo-count").textContent = places.reduce((sum, place) => sum + photoObjects(place).length, 0);
+      qs("#custom-place-count").textContent = customPlaces.length;
+    };
 
+    const renderCustomAlbums = () => {
+      const container = qs("#custom-albums");
+      if (!container) return;
+      container.innerHTML = customPlaces.map((place) => {
+        const photos = photoObjects(place);
+        const photoHtml = photos.length
+          ? photos.map((photo, index) => `
+            <button class="photo-button${index % 5 === 0 ? " is-large" : index % 3 === 0 ? " is-tall" : ""}" type="button" data-lightbox data-caption="${escapeHtml(photo.caption)}">
+              <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.caption)}" loading="lazy" decoding="async">
+            </button>
+          `).join("")
+          : `<div class="empty-state">这个地点还没有照片。可以在地点详情里编辑并上传。</div>`;
+        return `
+          <article class="album-block" id="album-${escapeHtml(place.id)}">
+            <div class="album-header">
+              <h3>${escapeHtml(place.name)}</h3>
+              <span>${escapeHtml(place.time || "未填写时间")} · ${photos.length} 张</span>
+            </div>
+            <p>${escapeHtml(effectivePlaceNote(place) || "还没有备注。")}</p>
+            ${createAlbumCoverHTML(place)}
+            <div class="photo-grid is-collapsed">${photoHtml}</div>
+          </article>
+        `;
+      }).join("");
+    };
 
+    const enhanceBuiltInAlbums = () => {
+      builtInPlaces.forEach((place) => {
+        const album = document.getElementById(place.sectionId);
+        if (!album) return;
+        const existingCover = qs("[data-album-cover]", album);
+        if (existingCover) {
+          existingCover.outerHTML = createAlbumCoverHTML(place);
+        } else {
+          const intro = album.querySelector(":scope > p");
+          if (intro) {
+            intro.insertAdjacentHTML("afterend", createAlbumCoverHTML(place));
+          }
+        }
 
+        const grid = qs(".photo-grid", album);
+        if (grid) {
+          grid.classList.add("is-collapsed");
+        }
+      });
+    };
 
-<div style="display: flex; justify-content: space-between; align-items: center;">
-    <img src="picture/sansan/sansan1.jpg" style="width: 400px; height: 600px;">
-    <img src="picture/sansan/sansan2.jpg" style="width: 400px; height: 600px;">
-    <img src="picture/sansan/sansan3.jpg" style="width: 400px; height: 600px;">
-</div>
+    const loadImageFromFile = (file) => new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(image);
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("图片读取失败"));
+      };
+      image.src = url;
+    });
 
-<div class="city">
-  <h1 id="wuhan">武汉之旅</h1>
-  <p>武汉小张和小郭是分开去的，小张是在2023年7月去的，小郭是在2025年1月去的</p>
-</div>
+    const compressImageFile = async (file, index = 0) => {
+      const image = await loadImageFromFile(file);
+      const maxSide = 1600;
+      const ratio = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+      const width = Math.max(1, Math.round(image.naturalWidth * ratio));
+      const height = Math.max(1, Math.round(image.naturalHeight * ratio));
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, width, height);
+      return {
+        id: `uploaded-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`,
+        src: canvas.toDataURL("image/jpeg", 0.82),
+        caption: file.name || `上传照片 ${index + 1}`,
+        name: file.name || "",
+        createdAt: new Date().toISOString()
+      };
+    };
 
-<!-- 确保 photo-grid 结构完整 -->
-<div class="photo-grid grid-cols-2x2">
-  <img src="picture/wuhan/wuhan1.jpg" alt="Wuhan Photo 1">
-  <img src="picture/wuhan/wuhan2.jpg" alt="Wuhan Photo 2">
-  <img src="picture/wuhan/wuhan3.jpg" alt="Wuhan Photo 3">
-  <img src="picture/wuhan/wuhan4.jpg" alt="Wuhan Photo 4">
-</div> <!-- 这里补上正确的 </div> 关闭标签 -->
+    const readPhotoFiles = (files) => Promise.all(
+      Array.from(files || []).slice(0, 8).map((file, index) => compressImageFile(file, index))
+    );
 
+    const setSelectedLocation = (position, name = "", label = "") => {
+      mapState.selectedLocation = position;
+      const locationLabel = label || `${name || "已选择位置"} · ${position[0].toFixed(5)}, ${position[1].toFixed(5)}`;
+      qs("#place-location-label").value = locationLabel;
+      qs("#selected-location-help").textContent = `已选择：${locationLabel}`;
+      if (name && !qs("#place-name").value.trim()) {
+        qs("#place-name").value = name;
+      }
 
-  <div class="city">
-  <h1 id="chendu">成都之旅</h1>
-  <p>
-      成都有好多好多大熊猫
-  </p>
-</div>
+      if (mapState.map && mapState.AMap) {
+        if (mapState.pendingMarker) {
+          mapState.pendingMarker.setMap(null);
+        }
+        mapState.pendingMarker = new mapState.AMap.Marker({
+          position,
+          content: "<div class=\"amap-place-marker is-custom\"><span></span><strong>待保存</strong></div>",
+          offset: new mapState.AMap.Pixel(-20, -42)
+        });
+        mapState.map.add(mapState.pendingMarker);
+        mapState.map.setZoomAndCenter(13, position, false, prefersReducedMotion ? 0 : 500);
+      }
+    };
 
+    const clearPendingMarker = () => {
+      if (mapState.pendingMarker) {
+        mapState.pendingMarker.setMap(null);
+        mapState.pendingMarker = null;
+      }
+      mapState.selectedLocation = null;
+    };
 
-  <div class="photo-grid grid-cols-3x3">
-      <img src="picture/chengdu/wuhan1.jpg" alt="Wuhan Photo 1">
-      <img src="picture/chengdu/wuhan2.jpg" alt="Wuhan Photo 2">
-      <img src="picture/chengdu/wuhan3.jpg" alt="Wuhan Photo 3">
-      <img src="picture/chengdu/wuhan4.jpg" alt="Wuhan Photo 4">
-      <img src="picture/chengdu/wuhan5.jpg" alt="Wuhan Photo 5">
-      <img src="picture/chengdu/wuhan6.jpg" alt="Wuhan Photo 6">
-      <img src="picture/chengdu/wuhan7.jpg" alt="Wuhan Photo 7">
-      <img src="picture/chengdu/wuhan8.jpg" alt="Wuhan Photo 8">
-      <img src="picture/chengdu/wuhan9.jpg" alt="Wuhan Photo 9">
-  </div>
+    const searchPlace = (keyword) => {
+      const query = (keyword || qs("#place-search-input").value || "").trim();
+      if (!query) return;
+      openPlaceForm();
 
+      if (!mapState.placeSearch) {
+        setStatus("地图加载后才能搜索地点。请先配置高德 API。", true);
+        return;
+      }
 
-  <div class="city">
-    <h1 id="chongqing">重庆之旅</h1>
-    <p>重庆有美味的火锅和壮观的山城景色</p>
-  </div>
-  <div class="photo-grid grid-cols-2x2">
-    <img src="picture/chongqing/chongqing1.jpg" alt="Chongqing Photo 1">
-    <img src="picture/chongqing/chongqing2.jpg" alt="Chongqing Photo 2">
-    <img src="picture/chongqing/chongqing3.jpg" alt="Chongqing Photo 3">
-    <img src="picture/chongqing/chongqing4.jpg" alt="Chongqing Photo 4">
-</div>
+      qs("#place-search-results").innerHTML = "<div class=\"empty-state\">正在搜索地点...</div>";
+      mapState.placeSearch.search(query, (status, result) => {
+        const pois = result?.poiList?.pois || [];
+        if (status !== "complete" || !pois.length) {
+          qs("#place-search-results").innerHTML = "<div class=\"empty-state\">没有找到匹配地点，可以直接在地图上点击选点。</div>";
+          return;
+        }
 
-<div class="city">
-  <h1 id="chongqing">2024秋季学期</h1>
-  <p>这个学期我们进入了大三</p>
-</div>
-<div class="photo-grid grid-cols-3x3">
-  <img src="picture/24fallsemester/24fallsemester1.jpg" alt="24Fall Semester Photo 1">
-  <img src="picture/24fallsemester/24fallsemester2.jpg" alt="24Fall Semester Photo 2">
-  <img src="picture/24fallsemester/24fallsemester3.jpg" alt="24Fall Semester Photo 3">
-  <img src="picture/24fallsemester/24fallsemester4.jpg" alt="24Fall Semester Photo 4">
-  <img src="picture/24fallsemester/24fallsemester5.jpg" alt="24Fall Semester Photo 5">
-  <img src="picture/24fallsemester/24fallsemester6.jpg" alt="24Fall Semester Photo 6">
-  <img src="picture/24fallsemester/24fallsemester7.jpg" alt="24Fall Semester Photo 7">
-  <img src="picture/24fallsemester/24fallsemester8.jpg" alt="24Fall Semester Photo 8">
-  <img src="picture/24fallsemester/24fallsemester9.jpg" alt="24Fall Semester Photo 9">
-</div>
-<div class="city">
-  <h1 id="taizhou">台州之旅</h1>
-  <p>台州的风景很美，还有很多美食！还听了著名戏曲家的戏！</p>
-</div>
+        qs("#place-search-results").innerHTML = pois
+          .filter((poi) => poi.location)
+          .slice(0, 6)
+          .map((poi, index) => `
+            <button class="search-result-button" type="button" data-search-result="${index}">
+              ${escapeHtml(poi.name)}
+              <small>${escapeHtml([poi.pname, poi.cityname, poi.adname, poi.address].filter(Boolean).join(" · "))}</small>
+            </button>
+          `).join("");
 
-<div class="photo-grid grid-cols-2x2">
-  <img src="picture/taizhou/taizhou1.jpg" alt="Taizhou Photo 1">
-  <img src="picture/taizhou/taizhou2.jpg" alt="Taizhou Photo 2">
-  <img src="picture/taizhou/taizhou3.jpg" alt="Taizhou Photo 3">
-  <img src="picture/taizhou/taizhou4.jpg" alt="Taizhou Photo 4">
-</div>
+        qs("#place-search-results")._pois = pois;
+      });
+    };
 
-<div class="city">
-  <h1 id="zhoushan">舟山之旅</h1>
-  <p>舟山的海鲜超美味，还有壮丽的海景！我们迎来了三周年！</p>
-</div>
+    const openPlaceForm = (placeId = "") => {
+      const form = qs("#place-form");
+      form.hidden = false;
+      form.reset();
+      qs("#place-search-results").innerHTML = "";
+      qs("#place-id").value = "";
+      qs("#place-form-title").textContent = "添加地点";
+      qs("#delete-place-button").hidden = true;
+      qs("#selected-location-help").textContent = "还没有选择地图位置。可以搜索地点，也可以直接点击地图。";
+      clearPendingMarker();
 
-<div class="photo-grid grid-cols-4x4">
-  <img src="picture/zhoushan/zhoushan1.jpg" alt="Zhoushan Photo 1">
-  <img src="picture/zhoushan/zhoushan2.jpg" alt="Zhoushan Photo 2">
-  <img src="picture/zhoushan/zhoushan3.jpg" alt="Zhoushan Photo 3">
-  <img src="picture/zhoushan/zhoushan4.jpg" alt="Zhoushan Photo 4">
-  <img src="picture/zhoushan/zhoushan5.jpg" alt="Zhoushan Photo 5">
-  <img src="picture/zhoushan/zhoushan6.jpg" alt="Zhoushan Photo 6">
-  <img src="picture/zhoushan/zhoushan7.jpg" alt="Zhoushan Photo 7">
-  <img src="picture/zhoushan/zhoushan8.jpg" alt="Zhoushan Photo 8">
-  <img src="picture/zhoushan/zhoushan9.jpg" alt="Zhoushan Photo 9">
-  <img src="picture/zhoushan/zhoushan10.jpg" alt="Zhoushan Photo 10">
-  <img src="picture/zhoushan/zhoushan11.jpg" alt="Zhoushan Photo 11">
-  <img src="picture/zhoushan/zhoushan12.jpg" alt="Zhoushan Photo 12">
-  <img src="picture/zhoushan/zhoushan13.jpg" alt="Zhoushan Photo 13">
-  <img src="picture/zhoushan/zhoushan14.jpg" alt="Zhoushan Photo 14">
-  <img src="picture/zhoushan/zhoushan15.jpg" alt="Zhoushan Photo 15">
-  <img src="picture/zhoushan/zhoushan16.jpg" alt="Zhoushan Photo 16">
-</div>
+      if (placeId) {
+        const place = customPlaces.find((item) => item.id === placeId);
+        if (!place) return;
+        qs("#place-form-title").textContent = "编辑地点";
+        qs("#place-id").value = place.id;
+        qs("#place-name").value = place.name;
+        qs("#place-time").value = place.time;
+        qs("#place-note").value = place.note;
+        qsa("input[name='place-tags']").forEach((input) => {
+          input.checked = place.tags.includes(input.value);
+        });
+        setSelectedLocation(place.position, place.name, place.address || `${place.position[0].toFixed(5)}, ${place.position[1].toFixed(5)}`);
+        qs("#delete-place-button").hidden = false;
+      }
 
+      form.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "nearest" });
+    };
 
+    const closePlaceForm = () => {
+      qs("#place-form").hidden = true;
+      qs("#place-search-results").innerHTML = "";
+      clearPendingMarker();
+    };
 
+    const savePlaceFromForm = async (event) => {
+      event.preventDefault();
+      const id = qs("#place-id").value;
+      const existing = customPlaces.find((place) => place.id === id);
+      const name = qs("#place-name").value.trim();
+      const time = qs("#place-time").value.trim();
+      const locationLabel = qs("#place-location-label").value.trim();
+      const note = qs("#place-note").value.trim();
+      const tags = qsa("input[name='place-tags']:checked").map((input) => input.value);
 
+      if (!name || !time || !mapState.selectedLocation) {
+        setStatus("地点名称、时间和地图位置都需要填写。", true);
+        return;
+      }
 
+      try {
+        const uploadedPhotos = await readPhotoFiles(qs("#place-photos").files);
+        const photos = existing?.photos || [];
+        const place = normalizePlace({
+          ...(existing || {}),
+          id: existing?.id || `custom-${Date.now()}`,
+          name,
+          time,
+          address: locationLabel,
+          position: mapState.selectedLocation,
+          note,
+          tags,
+          photos,
+          cover: existing?.cover || "",
+          readonly: false,
+          updatedAt: new Date().toISOString()
+        });
 
+        if (existing) {
+          customPlaces = customPlaces.map((item) => item.id === existing.id ? place : item);
+        } else {
+          customPlaces = [place, ...customPlaces];
+        }
 
+        if (uploadedPhotos.length) {
+          setPhotoOverrides(place.id, [
+            ...getPhotoOverrides(place.id),
+            ...uploadedPhotos
+          ]);
+        }
+
+        saveStoredPlaces();
+        refreshPlaceViews();
+        closePlaceForm();
+        openPlaceDetail(place.id);
+        setStatus("地点已保存到你的地图。");
+      } catch (error) {
+        console.error(error);
+        setStatus("保存失败。浏览器本地存储可能已满，建议减少上传照片数量或压缩图片。", true);
+      }
+    };
+
+    const deleteCustomPlace = (placeId) => {
+      const place = customPlaces.find((item) => item.id === placeId);
+      if (!place) return;
+      const ok = window.confirm("确定要删除这个地点吗？删除后无法恢复。");
+      if (!ok) return;
+      customPlaces = customPlaces.filter((item) => item.id !== placeId);
+      setPhotoOverrides(placeId, []);
+      clearNoteOverride(placeId);
+      saveStoredPlaces();
+      renderPlaceList();
+      renderCustomAlbums();
+      renderMapMarkers();
+      closePlaceForm();
+      closePlaceDetail();
+      setStatus("地点已删除。");
+    };
+
+    const refreshPlaceViews = () => {
+      renderPlaceList();
+      enhanceBuiltInAlbums();
+      renderCustomAlbums();
+      renderMapMarkers();
+      const openDetailPlaceId = qs("#place-detail")?.dataset.placeId;
+      const managerPlaceId = mapState.photoManagerPlaceId;
+      if (managerPlaceId && !qs("#photo-manager").hidden) {
+        renderPhotoManager(managerPlaceId);
+      }
+      if (openDetailPlaceId && !qs("#place-detail").hidden) {
+        openPlaceDetail(openDetailPlaceId);
+      }
+      if (managerPlaceId && mapState.map) {
+        const place = findPlace(managerPlaceId);
+        if (place) openInfoWindow(place);
+      }
+    };
+
+    const renderPhotoManager = (placeId) => {
+      const place = findPlace(placeId);
+      if (!place) return;
+      const originalPhotos = basePhotoObjects(place);
+      const uploadedPhotos = getPhotoOverrides(place.id);
+      const noteOverride = getNoteOverride(place.id);
+      qs("#photo-manager-title").textContent = `编辑回忆 · ${place.name}`;
+      qs("#memory-note-input").value = effectivePlaceNote(place);
+      qs("#memory-note-help").textContent = noteOverride
+        ? "当前显示的是保存在这个浏览器里的描述，可以随时恢复原描述。"
+        : "当前显示的是原描述，保存后只会写入当前浏览器。";
+      qs("#managed-original-photos").innerHTML = originalPhotos.length
+        ? originalPhotos.map((photo) => `
+          <div class="managed-photo">
+            <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.caption)}" loading="lazy" decoding="async">
+            <span>原始照片</span>
+          </div>
+        `).join("")
+        : `<div class="empty-state">这个地点还没有原始照片。</div>`;
+      qs("#managed-uploaded-photos").innerHTML = uploadedPhotos.length
+        ? uploadedPhotos.map((photo) => `
+          <div class="managed-photo">
+            <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.caption || "本地上传照片")}" loading="lazy" decoding="async">
+            <span>本地上传</span>
+            <button type="button" data-delete-uploaded-photo="${escapeHtml(photo.id)}">删除</button>
+          </div>
+        `).join("")
+        : `<div class="empty-state">还没有本地上传照片。上传几张照片，让这段回忆更完整。</div>`;
+    };
+
+    const openPhotoManager = (placeId) => {
+      const manager = qs("#photo-manager");
+      const place = findPlace(placeId);
+      if (!manager || !place) return;
+      mapState.photoManagerPlaceId = placeId;
+      qs("#photo-manager-input").value = "";
+      renderPhotoManager(placeId);
+      manager.hidden = false;
+      document.body.classList.add("lightbox-open");
+    };
+
+    const closePhotoManager = () => {
+      const manager = qs("#photo-manager");
+      if (!manager) return;
+      manager.hidden = true;
+      mapState.photoManagerPlaceId = "";
+      qs("#photo-manager-input").value = "";
+      if (qs("#place-detail").hidden && qs("#lightbox").hidden) {
+        document.body.classList.remove("lightbox-open");
+      }
+    };
+
+    const uploadManagedPhotos = async () => {
+      const placeId = mapState.photoManagerPlaceId;
+      if (!placeId) return;
+      const input = qs("#photo-manager-input");
+      if (!input.files || !input.files.length) {
+        setStatus("请选择要上传的照片。");
+        return;
+      }
+
+      try {
+        const existing = getPhotoOverrides(placeId);
+        const nextPhotos = [
+          ...existing,
+          ...(await readPhotoFiles(input.files))
+        ];
+        setPhotoOverrides(placeId, nextPhotos);
+        input.value = "";
+        refreshPlaceViews();
+        setStatus("照片已保存到当前浏览器。");
+      } catch (error) {
+        console.error(error);
+        setStatus("照片保存失败。浏览器本地存储可能已满，可以减少照片数量或换更小的图片。", true);
+      }
+    };
+
+    const deleteUploadedPhoto = (photoId) => {
+      const placeId = mapState.photoManagerPlaceId;
+      if (!placeId || !photoId) return;
+      const nextPhotos = getPhotoOverrides(placeId).filter((photo) => photo.id !== photoId);
+      setPhotoOverrides(placeId, nextPhotos);
+      refreshPlaceViews();
+      setStatus("本地上传照片已删除，原始照片已保留。");
+    };
+
+    const saveManagedPlaceNote = () => {
+      const placeId = mapState.photoManagerPlaceId;
+      const place = findPlace(placeId);
+      if (!place) return;
+      const note = qs("#memory-note-input").value.trim();
+      setNoteOverride(placeId, note);
+      refreshPlaceViews();
+      setStatus("描述已保存到当前浏览器。");
+    };
+
+    const resetManagedPlaceNote = () => {
+      const placeId = mapState.photoManagerPlaceId;
+      const place = findPlace(placeId);
+      if (!place) return;
+      clearNoteOverride(placeId);
+      qs("#memory-note-input").value = basePlaceNote(place);
+      refreshPlaceViews();
+      setStatus("已恢复原描述。");
+    };
+
+    const openPlaceDetail = (placeId) => {
+      const place = findPlace(placeId);
+      const detail = qs("#place-detail");
+      if (!place || !detail) return;
+      const photos = photoObjects(place);
+      const cover = getCover(place);
+      detail.dataset.placeId = place.id;
+      qs("#place-detail-title").textContent = place.name;
+      qs("#place-detail-hero").innerHTML = cover
+        ? createPhotoStackHTML(place, { className: "is-detail-hero", label: `${place.name}照片预览` })
+        : `<div class="map-fallback">这个地点还没有照片。</div>`;
+      qs("#place-detail-meta").innerHTML = `
+        <span>${escapeHtml(place.time || "未填写时间")}</span>
+        <span>${photos.length} 张照片</span>
+        ${place.address ? `<span>${escapeHtml(place.address)}</span>` : ""}
+        ${place.tags.map((tag) => `<span class="place-tag">${escapeHtml(tag)}</span>`).join("")}
+      `;
+      qs("#place-detail-note").textContent = effectivePlaceNote(place) || "还没有备注。";
+      qs("#place-detail-photos").innerHTML = photos.length
+        ? photos.map((photo) => `
+          <button type="button" data-lightbox data-caption="${escapeHtml(photo.caption)}">
+            <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.caption)}" loading="lazy" decoding="async">
+          </button>
+        `).join("")
+        : `<div class="empty-state">这个地点还没有照片。上传几张照片，让这段回忆更完整。</div>`;
+      qs("#place-detail-actions").innerHTML = `
+        ${place.sectionId ? `<button class="text-button primary" type="button" data-scroll-album="${escapeHtml(place.sectionId)}">进入相册</button>` : `<button class="text-button primary" type="button" data-scroll-album="album-${escapeHtml(place.id)}">进入相册</button>`}
+        <button class="text-button" type="button" data-manage-photos="${escapeHtml(place.id)}">编辑回忆</button>
+      `;
+      detail.hidden = false;
+      document.body.classList.add("lightbox-open");
+    };
+
+    const closePlaceDetail = () => {
+      const detail = qs("#place-detail");
+      if (!detail) return;
+      detail.hidden = true;
+      detail.dataset.placeId = "";
+      if (qs("#photo-manager").hidden && qs("#lightbox").hidden) {
+        document.body.classList.remove("lightbox-open");
+      }
+    };
+
+    const initLightbox = () => {
+      const lightbox = document.getElementById("lightbox");
+      if (!lightbox) return;
+
+      const image = lightbox.querySelector(".lightbox-image");
+      const caption = lightbox.querySelector(".lightbox-caption");
+      const closeButton = lightbox.querySelector(".lightbox-close");
+      const prevButton = lightbox.querySelector(".lightbox-prev");
+      const nextButton = lightbox.querySelector(".lightbox-next");
+      let activeIndex = 0;
+      let lastFocused = null;
+
+      const getItems = () => Array.from(document.querySelectorAll("[data-lightbox]"));
+
+      const getItemData = (item) => {
+        const img = item.querySelector("img");
+        return {
+          src: img ? img.currentSrc || img.src : "",
+          alt: img ? img.alt : "",
+          caption: item.getAttribute("data-caption") || (img ? img.alt : "")
+        };
+      };
+
+      const showItem = (index) => {
+        const items = getItems();
+        if (!items.length) return;
+        activeIndex = (index + items.length) % items.length;
+        const data = getItemData(items[activeIndex]);
+        image.src = data.src;
+        image.alt = data.alt;
+        caption.textContent = data.caption;
+      };
+
+      const openLightbox = (index, trigger) => {
+        lastFocused = trigger;
+        showItem(index);
+        lightbox.hidden = false;
+        document.body.classList.add("lightbox-open");
+        closeButton.focus({ preventScroll: true });
+      };
+
+      const closeLightbox = () => {
+        lightbox.hidden = true;
+        if (qs("#place-detail").hidden && qs("#photo-manager").hidden) {
+          document.body.classList.remove("lightbox-open");
+        }
+        image.removeAttribute("src");
+        if (lastFocused) {
+          lastFocused.focus({ preventScroll: true });
+        }
+      };
+
+      document.addEventListener("click", (event) => {
+        const item = event.target.closest("[data-lightbox]");
+        if (!item || item.closest(".lightbox")) return;
+        const items = getItems();
+        const index = items.indexOf(item);
+        if (index < 0) return;
+        openLightbox(index, item);
+      });
+
+      closeButton.addEventListener("click", closeLightbox);
+      prevButton.addEventListener("click", () => showItem(activeIndex - 1));
+      nextButton.addEventListener("click", () => showItem(activeIndex + 1));
+
+      lightbox.addEventListener("click", (event) => {
+        if (event.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (lightbox.hidden) return;
+        if (event.key === "Escape") closeLightbox();
+        if (event.key === "ArrowLeft") showItem(activeIndex - 1);
+        if (event.key === "ArrowRight") showItem(activeIndex + 1);
+      });
+    };
+
+    const setPhotoStackFront = (card) => {
+      const stack = card?.closest(".photo-stack");
+      if (!stack) return;
+      qsa(".photo-stack-card", stack).forEach((item) => item.classList.remove("is-front"));
+      card.classList.add("is-front");
+      stack.dataset.frontIndex = card.dataset.stackIndex || "";
+    };
+
+    const initMapAlbumInteractions = () => {
+      renderPlaceList();
+      enhanceBuiltInAlbums();
+      renderCustomAlbums();
+      renderAmapConfigPanel();
+
+      qs("#save-amap-config").addEventListener("click", () => {
+        const key = qs("#amap-key-input").value.trim();
+        const securityJsCode = qs("#amap-security-input").value.trim();
+        if (!key || !securityJsCode) {
+          setStatus("请同时填写 Key 和 securityJsCode。", true);
+          return;
+        }
+        localStorage.setItem(AMAP_CONFIG_STORAGE_KEY, JSON.stringify({ key, securityJsCode }));
+        qs("#amap-config-panel").hidden = true;
+        initTravelMap();
+      });
+
+      qs("#place-search-button").addEventListener("click", () => searchPlace());
+      qs("#place-search-input").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          searchPlace();
+        }
+      });
+      qs("#open-place-form").addEventListener("click", () => openPlaceForm());
+      qs("#cancel-place-form").addEventListener("click", closePlaceForm);
+      qs("#place-form").addEventListener("submit", savePlaceFromForm);
+      qs("#delete-place-button").addEventListener("click", () => {
+        const id = qs("#place-id").value;
+        if (id) deleteCustomPlace(id);
+      });
+      qs("#fit-map-button").addEventListener("click", fitAllPlaces);
+      qs("#close-place-detail").addEventListener("click", closePlaceDetail);
+      qs("#close-photo-manager").addEventListener("click", closePhotoManager);
+      qs("#upload-managed-photos").addEventListener("click", uploadManagedPhotos);
+      qs("#save-memory-note").addEventListener("click", saveManagedPlaceNote);
+      qs("#reset-memory-note").addEventListener("click", resetManagedPlaceNote);
+      qs("#place-detail").addEventListener("click", (event) => {
+        if (event.target === qs("#place-detail")) {
+          closePlaceDetail();
+        }
+      });
+      qs("#photo-manager").addEventListener("click", (event) => {
+        if (event.target === qs("#photo-manager")) {
+          closePhotoManager();
+        }
+      });
+
+      document.addEventListener("pointerover", (event) => {
+        const card = event.target.closest("[data-stack-card]");
+        if (card) setPhotoStackFront(card);
+      });
+
+      document.addEventListener("focusin", (event) => {
+        const card = event.target.closest("[data-stack-card]");
+        if (card) setPhotoStackFront(card);
+      });
+
+      document.addEventListener("click", (event) => {
+        const stackCard = event.target.closest("[data-stack-card]");
+        if (stackCard) {
+          setPhotoStackFront(stackCard);
+          return;
+        }
+
+        const searchResult = event.target.closest("[data-search-result]");
+        if (searchResult) {
+          const pois = qs("#place-search-results")._pois || [];
+          const poi = pois[Number(searchResult.dataset.searchResult)];
+          if (poi?.location) {
+            const address = [poi.pname, poi.cityname, poi.adname, poi.address].filter(Boolean).join(" · ");
+            setSelectedLocation([poi.location.lng, poi.location.lat], poi.name, address || poi.name);
+          }
+          return;
+        }
+
+        const focusButton = event.target.closest("[data-focus-place]");
+        if (focusButton) {
+          focusPlaceOnMap(focusButton.dataset.focusPlace);
+          return;
+        }
+
+        const manageButton = event.target.closest("[data-manage-photos]");
+        if (manageButton) {
+          openPhotoManager(manageButton.dataset.managePhotos);
+          return;
+        }
+
+        const toggleButton = event.target.closest("[data-toggle-album]");
+        if (toggleButton) {
+          const album = document.getElementById(toggleButton.dataset.toggleAlbum);
+          const grid = album?.querySelector(".photo-grid");
+          if (!grid) return;
+          const willExpand = grid.classList.contains("is-collapsed");
+          grid.classList.toggle("is-collapsed", !willExpand);
+          toggleButton.setAttribute("aria-expanded", String(willExpand));
+          toggleButton.textContent = willExpand ? "收起照片墙" : "查看照片墙";
+          return;
+        }
+
+        const deleteUploadedButton = event.target.closest("[data-delete-uploaded-photo]");
+        if (deleteUploadedButton) {
+          deleteUploadedPhoto(deleteUploadedButton.dataset.deleteUploadedPhoto);
+          return;
+        }
+
+        const detailButton = event.target.closest("[data-view-place]");
+        if (detailButton) {
+          openPlaceDetail(detailButton.dataset.viewPlace);
+          return;
+        }
+
+        const editButton = event.target.closest("[data-edit-place]");
+        if (editButton) {
+          closePlaceDetail();
+          openPlaceForm(editButton.dataset.editPlace);
+          return;
+        }
+
+        const deleteButton = event.target.closest("[data-delete-place]");
+        if (deleteButton) {
+          deleteCustomPlace(deleteButton.dataset.deletePlace);
+          return;
+        }
+
+        const albumButton = event.target.closest("[data-scroll-album]");
+        if (albumButton) {
+          closePlaceDetail();
+          scrollToAlbum(albumButton.dataset.scrollAlbum);
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !qs("#photo-manager").hidden) {
+          closePhotoManager();
+          return;
+        }
+        if (event.key === "Escape" && !qs("#place-detail").hidden) {
+          closePlaceDetail();
+        }
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        initMapAlbumInteractions();
+        initLightbox();
+        initTravelMap();
+      });
+    } else {
+      initMapAlbumInteractions();
+      initLightbox();
+      initTravelMap();
+    }
+  </script>
 </body>
-    
 </html>
