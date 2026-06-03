@@ -2013,8 +2013,8 @@
           </div>
           <div id="travel-map" aria-label="旅行地图"></div>
           <div class="map-config-panel" id="amap-config-panel" hidden>
-            <h3>连接高德地图</h3>
-            <p>输入你的高德 Web JSAPI Key 和安全密钥。它们只会保存在当前浏览器，用来加载这张地图。</p>
+            <h3>地图已内置配置</h3>
+            <p>高德地图 API 已经写入页面，打开网站后会自动加载地图。</p>
             <div class="map-config-grid">
               <input id="amap-key-input" type="password" autocomplete="off" placeholder="AMap JSAPI Key">
               <input id="amap-security-input" type="password" autocomplete="off" placeholder="securityJsCode">
@@ -2269,14 +2269,14 @@
         <div class="memory-note-editor">
           <label for="memory-note-input">地点描述</label>
           <textarea id="memory-note-input" maxlength="220" placeholder="写下这段回忆里最想留下的话。"></textarea>
-          <p class="form-help" id="memory-note-help">描述只保存在当前浏览器，不会修改原始照片和地点资料。</p>
+          <p class="form-help" id="memory-note-help">描述会保存到共享数据库，不会修改原始照片和地点资料。</p>
           <div class="form-actions">
             <button class="text-button primary" type="button" id="save-memory-note">保存描述</button>
             <button class="text-button" type="button" id="reset-memory-note">恢复原描述</button>
           </div>
         </div>
         <div class="photo-manager-upload">
-          <p class="form-help">上传的照片会压缩后保存在当前浏览器，不会写入项目里的原始图片文件。</p>
+          <p class="form-help">上传的照片会压缩后保存到共享相册，不会写入项目里的原始图片文件。</p>
           <input id="photo-manager-input" type="file" accept="image/*" multiple>
           <div class="form-actions">
             <button class="text-button primary" type="button" id="upload-managed-photos">上传照片</button>
@@ -2305,12 +2305,27 @@
   </div>
 
   <script src="https://webapi.amap.com/loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const AMAP_CONFIG_STORAGE_KEY = "memoryMap.amapConfig.v1";
     const CUSTOM_PLACES_STORAGE_KEY = "memoryMap.customPlaces.v1";
     const PHOTO_OVERRIDES_STORAGE_KEY = "memoryMap.placePhotoOverrides.v1";
     const NOTE_OVERRIDES_STORAGE_KEY = "memoryMap.placeNoteOverrides.v1";
+    const AMAP_EMBEDDED_CONFIG = {
+      key: "ca1d3dbe82f1f8082e405e9a66443ab7",
+      securityJsCode: "24e657d163b827679501af9a12752250"
+    };
+    const SUPABASE_URL = "https://axtadhvnjqolhwuczism.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_gUmhGUZR6ue7BEqz92jadQ_sWgDbJBG";
+    const SUPABASE_PHOTO_BUCKET = "memory-photos";
+    const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const remoteMemoryState = {
+      notesLoaded: false,
+      photosLoaded: false,
+      notes: {},
+      photos: {}
+    };
 
     if (!prefersReducedMotion && "IntersectionObserver" in window) {
       const observer = new IntersectionObserver((entries) => {
@@ -2513,6 +2528,9 @@
     };
 
     const getPhotoOverrides = (placeId) => {
+      if (remoteMemoryState.photosLoaded) {
+        return Array.isArray(remoteMemoryState.photos[placeId]) ? remoteMemoryState.photos[placeId] : [];
+      }
       const overrides = getPhotoOverridesMap();
       return Array.isArray(overrides[placeId]) ? overrides[placeId] : [];
     };
@@ -2540,6 +2558,9 @@
     };
 
     const getNoteOverride = (placeId) => {
+      if (remoteMemoryState.notesLoaded) {
+        return Object.prototype.hasOwnProperty.call(remoteMemoryState.notes, placeId) ? remoteMemoryState.notes[placeId] : null;
+      }
       const overrides = getNoteOverridesMap();
       return Object.prototype.hasOwnProperty.call(overrides, placeId) ? overrides[placeId] : null;
     };
@@ -2564,6 +2585,115 @@
     const effectivePlaceNote = (place) => {
       const override = getNoteOverride(place.id);
       return override && typeof override.note === "string" ? override.note : basePlaceNote(place);
+    };
+
+    const remotePhotoFromRow = (row, index = 0) => ({
+      id: row.id || `remote-${index}`,
+      src: row.public_url,
+      caption: row.caption || "本地上传照片",
+      source: "uploaded",
+      createdAt: row.created_at || "",
+      storagePath: row.storage_path || "",
+      remote: true
+    });
+
+    const hydrateRemotePhotos = (rows = []) => {
+      remoteMemoryState.photos = rows.reduce((groups, row, index) => {
+        if (!row.place_id || !row.public_url) return groups;
+        groups[row.place_id] = groups[row.place_id] || [];
+        groups[row.place_id].push(remotePhotoFromRow(row, index));
+        return groups;
+      }, {});
+      remoteMemoryState.photosLoaded = true;
+    };
+
+    const hydrateRemoteNotes = (rows = []) => {
+      remoteMemoryState.notes = rows.reduce((notes, row) => {
+        if (!row.place_id) return notes;
+        notes[row.place_id] = {
+          note: row.note || "",
+          updatedAt: row.updated_at || ""
+        };
+        return notes;
+      }, {});
+      remoteMemoryState.notesLoaded = true;
+    };
+
+    const loadRemoteMemoryData = async () => {
+      if (!supabaseClient) return;
+      try {
+        const [{ data: noteRows, error: noteError }, { data: photoRows, error: photoError }] = await Promise.all([
+          supabaseClient.from("place_notes").select("place_id,note,updated_at"),
+          supabaseClient.from("place_photos").select("id,place_id,storage_path,public_url,caption,created_at").order("created_at", { ascending: true })
+        ]);
+
+        if (noteError || photoError) {
+          throw noteError || photoError;
+        }
+
+        hydrateRemoteNotes(noteRows || []);
+        hydrateRemotePhotos(photoRows || []);
+        refreshPlaceViews();
+      } catch (error) {
+        console.warn("Supabase sync unavailable:", error);
+        setStatus("共享数据库还没有初始化，当前会先使用本地保存。", true);
+      }
+    };
+
+    const dataUrlToBlob = (dataUrl) => {
+      const [meta, base64] = dataUrl.split(",");
+      const contentType = meta.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
+      const bytes = atob(base64 || "");
+      const buffer = new Uint8Array(bytes.length);
+      for (let index = 0; index < bytes.length; index += 1) {
+        buffer[index] = bytes.charCodeAt(index);
+      }
+      return new Blob([buffer], { type: contentType });
+    };
+
+    const uploadRemotePhotos = async (placeId, photos) => {
+      if (!supabaseClient) {
+        throw new Error("Supabase client unavailable");
+      }
+
+      const savedPhotos = [];
+      for (const [index, photo] of photos.entries()) {
+        const blob = dataUrlToBlob(photo.src);
+        const storagePath = `${placeId}/${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+        const { error: uploadError } = await supabaseClient
+          .storage
+          .from(SUPABASE_PHOTO_BUCKET)
+          .upload(storagePath, blob, {
+            cacheControl: "3600",
+            contentType: "image/jpeg",
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicData } = supabaseClient.storage.from(SUPABASE_PHOTO_BUCKET).getPublicUrl(storagePath);
+        const publicUrl = publicData.publicUrl;
+        const { data, error } = await supabaseClient
+          .from("place_photos")
+          .insert({
+            place_id: placeId,
+            storage_path: storagePath,
+            public_url: publicUrl,
+            caption: photo.caption
+          })
+          .select("id,place_id,storage_path,public_url,caption,created_at")
+          .single();
+
+        if (error) throw error;
+        savedPhotos.push(remotePhotoFromRow(data, index));
+      }
+
+      remoteMemoryState.photosLoaded = true;
+      remoteMemoryState.photos[placeId] = [
+        ...(remoteMemoryState.photos[placeId] || []),
+        ...savedPhotos
+      ];
+      return savedPhotos;
     };
 
     const photoObjects = (place) => [
@@ -2709,9 +2839,12 @@
 
     const getAmapConfig = () => {
       try {
-        return JSON.parse(localStorage.getItem(AMAP_CONFIG_STORAGE_KEY) || "{}");
+        return {
+          ...AMAP_EMBEDDED_CONFIG,
+          ...JSON.parse(localStorage.getItem(AMAP_CONFIG_STORAGE_KEY) || "{}")
+        };
       } catch {
-        return {};
+        return AMAP_EMBEDDED_CONFIG;
       }
     };
 
@@ -2726,7 +2859,7 @@
       const config = getAmapConfig();
       qs("#amap-key-input").value = config.key || "";
       qs("#amap-security-input").value = config.securityJsCode || "";
-      panel.hidden = hasAmapConfig();
+      panel.hidden = true;
     };
 
     const initTravelMap = async () => {
@@ -2736,7 +2869,7 @@
       renderAmapConfigPanel();
 
       if (!hasAmapConfig()) {
-        mapEl.innerHTML = "<div class=\"map-fallback\">输入高德地图 API 后，这里会显示可交互的回忆地图。</div>";
+        mapEl.innerHTML = "<div class=\"map-fallback\">地图 API 未配置，暂时无法显示交互地图。</div>";
         setStatus("");
         return;
       }
@@ -2818,7 +2951,7 @@
       } catch (error) {
         console.error(error);
         mapEl.innerHTML = "<div class=\"map-fallback\">高德地图加载失败。请检查 Key、安全密钥和网络。</div>";
-        qs("#amap-config-panel").hidden = false;
+        qs("#amap-config-panel").hidden = true;
         setStatus("地图加载失败，请检查高德 API 配置。", true);
       } finally {
         mapState.loading = false;
@@ -3214,8 +3347,8 @@
       qs("#photo-manager-title").textContent = `编辑回忆 · ${place.name}`;
       qs("#memory-note-input").value = effectivePlaceNote(place);
       qs("#memory-note-help").textContent = noteOverride
-        ? "当前显示的是保存在这个浏览器里的描述，可以随时恢复原描述。"
-        : "当前显示的是原描述，保存后只会写入当前浏览器。";
+        ? "当前显示的是共享描述，可以随时恢复原描述。"
+        : "当前显示的是原描述，保存后会同步给打开这个网站的人。";
       qs("#managed-original-photos").innerHTML = originalPhotos.length
         ? originalPhotos.map((photo) => `
           <div class="managed-photo">
@@ -3267,48 +3400,109 @@
       }
 
       try {
-        const existing = getPhotoOverrides(placeId);
-        const nextPhotos = [
-          ...existing,
-          ...(await readPhotoFiles(input.files))
-        ];
-        setPhotoOverrides(placeId, nextPhotos);
+        const uploadedPhotos = await readPhotoFiles(input.files);
+        try {
+          await uploadRemotePhotos(placeId, uploadedPhotos);
+          setPhotoOverrides(placeId, []);
+          setStatus("照片已同步保存。");
+        } catch (remoteError) {
+          console.warn("Supabase upload failed, using local fallback:", remoteError);
+          const existing = getPhotoOverridesMap()[placeId] || [];
+          setPhotoOverrides(placeId, [
+            ...existing,
+            ...uploadedPhotos
+          ]);
+          setStatus("共享数据库暂不可用，照片已先保存到当前浏览器。", true);
+        }
         input.value = "";
         refreshPlaceViews();
-        setStatus("照片已保存到当前浏览器。");
       } catch (error) {
         console.error(error);
         setStatus("照片保存失败。浏览器本地存储可能已满，可以减少照片数量或换更小的图片。", true);
       }
     };
 
-    const deleteUploadedPhoto = (photoId) => {
+    const deleteUploadedPhoto = async (photoId) => {
       const placeId = mapState.photoManagerPlaceId;
       if (!placeId || !photoId) return;
-      const nextPhotos = getPhotoOverrides(placeId).filter((photo) => photo.id !== photoId);
-      setPhotoOverrides(placeId, nextPhotos);
-      refreshPlaceViews();
-      setStatus("本地上传照片已删除，原始照片已保留。");
+      const currentPhotos = getPhotoOverrides(placeId);
+      const photo = currentPhotos.find((item) => item.id === photoId);
+
+      try {
+        if (photo?.remote && supabaseClient) {
+          if (photo.storagePath) {
+            const { error: storageError } = await supabaseClient.storage.from(SUPABASE_PHOTO_BUCKET).remove([photo.storagePath]);
+            if (storageError) throw storageError;
+          }
+          const { error } = await supabaseClient.from("place_photos").delete().eq("id", photoId);
+          if (error) throw error;
+          remoteMemoryState.photos[placeId] = currentPhotos.filter((item) => item.id !== photoId);
+          setStatus("共享照片已删除，原始照片已保留。");
+        } else {
+          const nextPhotos = (getPhotoOverridesMap()[placeId] || []).filter((item) => item.id !== photoId);
+          setPhotoOverrides(placeId, nextPhotos);
+          setStatus("本地上传照片已删除，原始照片已保留。");
+        }
+        refreshPlaceViews();
+      } catch (error) {
+        console.error(error);
+        setStatus("照片删除失败，请稍后再试。", true);
+      }
     };
 
-    const saveManagedPlaceNote = () => {
+    const saveManagedPlaceNote = async () => {
       const placeId = mapState.photoManagerPlaceId;
       const place = findPlace(placeId);
       if (!place) return;
       const note = qs("#memory-note-input").value.trim();
-      setNoteOverride(placeId, note);
+
+      try {
+        if (!supabaseClient) throw new Error("Supabase client unavailable");
+        const { data, error } = await supabaseClient
+          .from("place_notes")
+          .upsert({
+            place_id: placeId,
+            note,
+            updated_at: new Date().toISOString()
+          })
+          .select("place_id,note,updated_at")
+          .single();
+        if (error) throw error;
+        remoteMemoryState.notesLoaded = true;
+        remoteMemoryState.notes[placeId] = {
+          note: data.note || "",
+          updatedAt: data.updated_at || ""
+        };
+        clearNoteOverride(placeId);
+        setStatus("描述已同步保存。");
+      } catch (error) {
+        console.warn("Supabase note save failed, using local fallback:", error);
+        setNoteOverride(placeId, note);
+        setStatus("共享数据库暂不可用，描述已先保存到当前浏览器。", true);
+      }
+
       refreshPlaceViews();
-      setStatus("描述已保存到当前浏览器。");
     };
 
-    const resetManagedPlaceNote = () => {
+    const resetManagedPlaceNote = async () => {
       const placeId = mapState.photoManagerPlaceId;
       const place = findPlace(placeId);
       if (!place) return;
-      clearNoteOverride(placeId);
-      qs("#memory-note-input").value = basePlaceNote(place);
-      refreshPlaceViews();
-      setStatus("已恢复原描述。");
+
+      try {
+        if (supabaseClient && remoteMemoryState.notesLoaded) {
+          const { error } = await supabaseClient.from("place_notes").delete().eq("place_id", placeId);
+          if (error) throw error;
+          delete remoteMemoryState.notes[placeId];
+        }
+        clearNoteOverride(placeId);
+        qs("#memory-note-input").value = basePlaceNote(place);
+        refreshPlaceViews();
+        setStatus("已恢复原描述。");
+      } catch (error) {
+        console.error(error);
+        setStatus("恢复原描述失败，请稍后再试。", true);
+      }
     };
 
     const openPlaceDetail = (placeId) => {
@@ -3589,11 +3783,13 @@
       document.addEventListener("DOMContentLoaded", () => {
         initMapAlbumInteractions();
         initLightbox();
+        loadRemoteMemoryData();
         initTravelMap();
       });
     } else {
       initMapAlbumInteractions();
       initLightbox();
+      loadRemoteMemoryData();
       initTravelMap();
     }
   </script>
