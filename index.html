@@ -6,6 +6,7 @@
   <meta name="author" content="Houxuan Zhang">
   <title>Houxuan & Linsan · 我们去过的地方</title>
   <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://use.typekit.net/pxn8wdc.css">
   <style>
     :root {
       --page: #f5f5f7;
@@ -34,12 +35,14 @@
     html {
       scroll-behavior: smooth;
       scroll-padding-top: 96px;
+      overflow-x: clip;
       background: var(--page);
     }
 
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: clip;
       color: var(--text);
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(245, 245, 247, 0) 34%),
@@ -328,6 +331,283 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.5;
+    }
+
+    .codrops-stage {
+      font-size: 16px;
+      --color-text: #fff;
+      --color-bg: #000;
+      --color-link: #fff;
+      --color-link-hover: #ef5d36;
+      --color-title: #fff;
+      --perspective: 0px;
+      --grid-width: 100%;
+      --grid-max-width: 300px;
+      --grid-item-ratio: 1.2;
+      --grid-item-radius: 4px;
+      --grid-gap: 2rem;
+      --grid-columns: 2;
+      --grid-columns-full: 7;
+      --grid-rows-full: 5;
+      --grid-item-translate: 0px;
+      --grid-item-height: auto;
+      width: 100%;
+      overflow-x: hidden;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      font-family: "brisbane", "SF Pro Display", "PingFang SC", sans-serif;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .codrops-stage .font-alt {
+      font-family: "lores-12", "SFMono-Regular", "Cascadia Mono", "PingFang SC", monospace;
+      font-weight: 400;
+    }
+
+    .codrops-stage a {
+      color: var(--color-link);
+      text-decoration: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .codrops-stage a:hover {
+      color: var(--color-link-hover);
+      outline: none;
+    }
+
+    .codrops-stage a:focus {
+      outline: none;
+      background: lightgrey;
+    }
+
+    .codrops-stage a:focus:not(:focus-visible) {
+      background: transparent;
+    }
+
+    .codrops-stage a:focus-visible {
+      outline: 2px solid red;
+      background: transparent;
+    }
+
+    .codrops-main {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      background: var(--color-bg);
+    }
+
+    .codrops-stage .frame {
+      text-transform: uppercase;
+      font-size: 13px;
+      position: relative;
+      padding: 1.5rem;
+      display: grid;
+      width: 100%;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-areas: "back archive github" "sponsor sponsor sponsor";
+      grid-gap: 1.5rem;
+      z-index: 6000;
+    }
+
+    .codrops-stage .frame__back {
+      grid-area: back;
+    }
+
+    .codrops-stage .frame__archive {
+      grid-area: archive;
+    }
+
+    .codrops-stage .frame__github {
+      grid-area: github;
+    }
+
+    .codrops-stage .intro {
+      height: calc(100vh - 4rem);
+      text-align: center;
+      justify-items: center;
+      display: grid;
+      align-content: start;
+      margin-bottom: 30vh;
+      grid-auto-rows: 1fr;
+      gap: 1.5rem;
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.16) 28%, rgba(0, 0, 0, 0.42) 70%, var(--color-bg)),
+        var(--codrops-intro-image) no-repeat 50% 24%;
+      background-size: cover;
+    }
+
+    .codrops-stage .intro__title {
+      margin: 0;
+      line-height: 0.9;
+      align-self: end;
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: clamp(2rem, 6vw, 4rem);
+      color: var(--color-title);
+      transform: translateY(clamp(72px, 8vh, 116px));
+    }
+
+    .codrops-stage .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      text-transform: uppercase;
+      font-size: 13px;
+      align-self: start;
+      transform: translateY(clamp(72px, 8vh, 116px));
+    }
+
+    .codrops-stage .intro__info {
+      max-width: 12ch;
+      margin-bottom: 4rem;
+      padding-bottom: 1rem;
+      line-height: 1.2;
+      opacity: 0.4;
+      position: relative;
+      text-transform: uppercase;
+      font-size: 13px;
+      align-self: end;
+    }
+
+    .codrops-stage .intro__info::after {
+      content: "";
+      width: 1px;
+      height: 4rem;
+      background: linear-gradient(to bottom, #fff, black);
+      position: absolute;
+      top: 100%;
+      left: 50%;
+    }
+
+    .codrops-stage .mark {
+      position: fixed;
+      width: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100vw;
+      left: 0;
+      z-index: 50;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .codrops-stage .mark__inner {
+      display: flex;
+      gap: 3rem;
+      width: max-content;
+      position: relative;
+      transform: translateX(100vw);
+      will-change: transform;
+    }
+
+    .codrops-stage .mark__inner span {
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .codrops-stage section {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      position: relative;
+    }
+
+    .codrops-main.shadow::after {
+      content: "";
+      top: 0;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 5000;
+      pointer-events: none;
+      background: linear-gradient(to right, var(--color-bg), transparent, var(--color-bg));
+      background-repeat: no-repeat;
+      background-size: 100%;
+    }
+
+    .codrops-stage .grid {
+      padding: 20vh 0;
+      width: var(--grid-width);
+      max-width: var(--grid-max-width);
+      grid-template-columns: repeat(var(--grid-columns), 1fr);
+      position: relative;
+      display: grid;
+      gap: var(--grid-gap);
+      margin-top: 20vh;
+      margin-bottom: 10vh;
+    }
+
+    .codrops-stage .grid--full {
+      width: 100%;
+      margin: 10vh 0;
+      height: auto;
+      aspect-ratio: 1.5;
+      max-width: none;
+      --grid-gap: 1rem;
+      --grid-item-height: 100%;
+      --grid-item-ratio: auto;
+      padding: var(--grid-gap);
+      grid-template-columns: repeat(var(--grid-columns-full), 1fr);
+      grid-template-rows: repeat(var(--grid-rows-full), 1fr);
+    }
+
+    .codrops-stage .grid__item {
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      perspective: 800px;
+      will-change: transform, opacity;
+    }
+
+    .codrops-stage .grid__item > .grid__item-img,
+    .codrops-stage .grid__item-imgwrap {
+      width: 100%;
+      aspect-ratio: var(--grid-item-ratio);
+      height: var(--grid-item-height);
+      border-radius: var(--grid-item-radius);
+      transform-style: preserve-3d;
+    }
+
+    .codrops-stage .grid__item-imgwrap {
+      position: relative;
+      overflow: hidden;
+      will-change: filter;
+    }
+
+    .codrops-stage .grid__item-img {
+      background-size: cover;
+      background-position: 50% 20%;
+      backface-visibility: hidden;
+      will-change: transform;
+    }
+
+    .codrops-stage .grid__item-imgwrap > .grid__item-img {
+      position: absolute;
+      top: calc(-1 * var(--grid-item-translate));
+      left: calc(-1 * var(--grid-item-translate));
+      height: calc(100% + var(--grid-item-translate) * 2);
+      width: calc(100% + var(--grid-item-translate) * 2);
+    }
+
+    .codrops-stage .text {
+      text-transform: uppercase;
+      display: flex;
+      align-content: center;
+      font-size: clamp(3rem, 14vw, 10rem);
+      line-height: 0.7;
+    }
+
+    @media screen and (min-width: 53em) {
+      .codrops-stage .frame {
+        grid-template-columns: auto auto auto 1fr;
+        grid-template-areas: "back archive github sponsor";
+      }
     }
 
     .section {
@@ -1885,10 +2165,42 @@
         box-shadow: 0 16px 36px rgba(22, 24, 29, 0.15);
         transform: translate3d(calc(-50% + var(--fan-x)), calc(-50% + var(--fan-y)), 0) rotate(var(--fan-rotate));
       }
+
     }
   </style>
 </head>
 <body>
+  <div class="codrops-stage">
+    <main class="codrops-main shadow">
+      <div class="frame">
+        <a class="frame__back" href="#home">Home</a>
+        <a class="frame__archive" href="#map-section">Memory map</a>
+        <a class="frame__github" href="#gallery">Albums</a>
+      </div>
+      <div class="intro" style="--codrops-intro-image: url('picture/sansan/sansan2.jpg')">
+        <h1 class="intro__title font-alt">我们去过的地方</h1>
+        <nav class="tags" aria-label="相册标签">
+          <a href="#places">#travel</a>
+          <a href="#map-section">#map</a>
+          <a href="#gallery">#album</a>
+        </nav>
+        <span class="intro__info">Scroll gently &amp; enjoy</span>
+      </div>
+      <section aria-label="滚动照片与地点文字">
+        <div class="grid" id="codrops-memory-grid"></div>
+        <div class="mark">
+          <div class="mark__inner font-alt" id="codrops-memory-mark"></div>
+        </div>
+      </section>
+      <section aria-label="相册文字">
+        <div class="text font-alt">Houxuan &amp; Linsan</div>
+      </section>
+      <section aria-label="完整照片网格">
+        <div class="grid grid--full" id="codrops-full-grid"></div>
+      </section>
+    </main>
+  </div>
+
   <div class="shell" id="home">
     <nav class="nav" aria-label="主导航">
       <div class="nav-logo">Houxuan × Linsan</div>
@@ -2304,6 +2616,92 @@
     </div>
   </div>
 
+  <script>
+    (() => {
+      const codropsImages = [
+        "picture/sansan/sansan1.jpg",
+        "picture/sansan/sansan2.jpg",
+        "picture/sansan/sansan3.jpg",
+        "picture/wuhan/wuhan1.jpg",
+        "picture/wuhan/wuhan2.jpg",
+        "picture/wuhan/wuhan3.jpg",
+        "picture/wuhan/wuhan4.jpg",
+        "picture/chengdu/wuhan1.jpg",
+        "picture/chengdu/wuhan2.jpg",
+        "picture/chengdu/wuhan3.jpg",
+        "picture/chengdu/wuhan4.jpg",
+        "picture/chengdu/wuhan5.jpg",
+        "picture/chengdu/wuhan6.jpg",
+        "picture/chengdu/wuhan7.jpg",
+        "picture/chengdu/wuhan8.jpg",
+        "picture/chengdu/wuhan9.jpg",
+        "picture/chongqing/chongqing1.jpg",
+        "picture/chongqing/chongqing2.jpg",
+        "picture/chongqing/chongqing3.jpg",
+        "picture/chongqing/chongqing4.jpg",
+        "picture/24fallsemester/24fallsemester1.jpg",
+        "picture/24fallsemester/24fallsemester2.jpg",
+        "picture/24fallsemester/24fallsemester3.jpg",
+        "picture/24fallsemester/24fallsemester4.jpg",
+        "picture/24fallsemester/24fallsemester5.jpg",
+        "picture/24fallsemester/24fallsemester6.jpg",
+        "picture/24fallsemester/24fallsemester7.jpg",
+        "picture/24fallsemester/24fallsemester8.jpg",
+        "picture/24fallsemester/24fallsemester9.jpg",
+        "picture/taizhou/taizhou1.jpg",
+        "picture/taizhou/taizhou2.jpg",
+        "picture/taizhou/taizhou3.jpg",
+        "picture/taizhou/taizhou4.jpg",
+        "picture/zhoushan/zhoushan1.jpg",
+        "picture/zhoushan/zhoushan2.jpg",
+        "picture/zhoushan/zhoushan3.jpg",
+        "picture/zhoushan/zhoushan4.jpg",
+        "picture/zhoushan/zhoushan5.jpg",
+        "picture/zhoushan/zhoushan6.jpg",
+        "picture/zhoushan/zhoushan7.jpg",
+        "picture/zhoushan/zhoushan8.jpg",
+        "picture/zhoushan/zhoushan9.jpg",
+        "picture/zhoushan/zhoushan10.jpg",
+        "picture/zhoushan/zhoushan11.jpg",
+        "picture/zhoushan/zhoushan12.jpg",
+        "picture/zhoushan/zhoushan13.jpg",
+        "picture/zhoushan/zhoushan14.jpg",
+        "picture/zhoushan/zhoushan15.jpg",
+        "picture/zhoushan/zhoushan16.jpg"
+      ];
+      const codropsNames = [
+        "Wuhan", "武汉",
+        "Chengdu", "成都",
+        "Chongqing", "重庆",
+        "Fall 2024", "秋季学期",
+        "Taizhou", "台州",
+        "Zhoushan", "舟山"
+      ];
+      const createWrappedItem = (src) => `
+        <figure class="grid__item">
+          <div class="grid__item-imgwrap">
+            <div class="grid__item-img" style="background-image:url(${src})"></div>
+          </div>
+        </figure>
+      `;
+      const createFullItem = (src) => `
+        <figure class="grid__item">
+          <div class="grid__item-img" style="background-image:url(${src})"></div>
+        </figure>
+      `;
+      const cycleImages = (count, offset = 0) => Array.from({ length: count }, (_, index) => codropsImages[(index + offset) % codropsImages.length]);
+      document.getElementById("codrops-memory-grid").innerHTML = cycleImages(44).map(createWrappedItem).join("");
+      document.getElementById("codrops-full-grid").innerHTML = cycleImages(35, 3).map(createFullItem).join("");
+      document.getElementById("codrops-memory-mark").innerHTML = codropsNames.map((name) => `<span>${name}</span>`).join("");
+    })();
+  </script>
+  <script src="vendor/staggered-grid/gsap.min.js"></script>
+  <script src="vendor/staggered-grid/ScrollTrigger.min.js"></script>
+  <script src="vendor/staggered-grid/splittext-lite.js"></script>
+  <script src="vendor/staggered-grid/imagesloaded.pkgd.min.js"></script>
+  <script src="vendor/staggered-grid/lenis.min.js"></script>
+  <script src="vendor/staggered-grid/smoothscroll.js"></script>
+  <script type="module" src="vendor/staggered-grid/index.js?v=20260604-fast-start"></script>
   <script src="https://webapi.amap.com/loader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
