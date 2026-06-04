@@ -2618,7 +2618,7 @@
 
   <script>
     (() => {
-      const codropsImages = [
+      const codropsSourceImages = [
         "picture/sansan/sansan1.jpg",
         "picture/sansan/sansan2.jpg",
         "picture/sansan/sansan3.jpg",
@@ -2669,6 +2669,7 @@
         "picture/zhoushan/zhoushan15.jpg",
         "picture/zhoushan/zhoushan16.jpg"
       ];
+      const codropsImages = codropsSourceImages.map((src) => src.replace(/^picture\//, "picture/codrops-thumbs/"));
       const codropsNames = [
         "Wuhan", "武汉",
         "Chengdu", "成都",
