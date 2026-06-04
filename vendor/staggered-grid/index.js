@@ -26,28 +26,27 @@ const isLeftSide = (element) => {
 const animateScrollGrid = () => {
   gridImages.forEach(imageWrap => {
     const imgEl = imageWrap.querySelector('.grid__item-img'); // Select the image element inside the grid item
-    const shadeEl = imageWrap.querySelector('.grid__item-shade');
     const leftSide = isLeftSide(imageWrap); // Check if the element is on the left side of the viewport
 
     // Create a GSAP timeline with ScrollTrigger for each grid item
-    const timeline = gsap.timeline({
+    gsap.timeline({
       scrollTrigger: {
         trigger: imageWrap,               // Trigger the animation when this element enters the viewport
         start: 'top bottom+=10%',         // Start when the top of the element is 10% past the bottom of the viewport
         end: 'bottom top-=25%',           // End when the bottom of the element is 25% past the top of the viewport
         scrub: true,                      // Smooth scrub animation
       }
-    });
-
-    timeline
+    })
     .from(imageWrap, {
       // Initial state when the element enters the viewport
+      startAt: { filter: 'blur(0px) brightness(100%) contrast(100%)' }, // Ensure no blur or brightness adjustments at the start
       z: 300,                             // Translate the item 300px closer on the Z-axis
       rotateX: 70,                        // Start with a rotation of 70 degrees on the X-axis
       rotateZ: leftSide ? 5 : -5,         // Rotate 5 degrees if on the left, -5 degrees if on the right
       xPercent: leftSide ? -40 : 40,      // Horizontal translation: -40% if on the left, 40% if on the right
       skewX: leftSide ? -20 : 20,         // Skew the element on the X-axis
       yPercent: 100,                      // Start with the element below the viewport
+      filter: 'blur(7px) brightness(0%) contrast(400%)', // Start with a blur, low brightness, and high contrast
       ease: 'sine',                       
     })
     .to(imageWrap, {
@@ -57,6 +56,7 @@ const animateScrollGrid = () => {
       rotateZ: leftSide ? -1 : 1,         // Slightly rotate on the Z-axis (-1 or 1 depending on side)
       xPercent: leftSide ? -20 : 20,      // Move slightly left (-20%) or right (20%) on exit
       skewX: leftSide ? 10 : -10,         // Skew slightly on exit
+      filter: 'blur(4px) brightness(0%) contrast(500%)', // Add blur and reduce brightness on exit
       ease: 'sine.in',                    
     })
     .from(imgEl, {
@@ -68,20 +68,6 @@ const animateScrollGrid = () => {
       scaleY: 1.8,                        // Return to normal scaling
       ease: 'sine.in'                     
     }, '>');
-
-    if (shadeEl) {
-      timeline
-      .fromTo(shadeEl, {
-        autoAlpha: 0.84,
-      }, {
-        autoAlpha: 0,
-        ease: 'sine',
-      }, 0)
-      .to(shadeEl, {
-        autoAlpha: 0.78,
-        ease: 'sine.in',
-      }, 0.5);
-    }
   });
 };
 

@@ -1,16 +1,8 @@
 // Initializes smooth scrolling with Lenis and integrates it with GSAP's ScrollTrigger.
 // Function to set up smooth scrolling.
 const initSmoothScrolling = () => {
-  if (!window.Lenis || !window.ScrollTrigger || !window.gsap) return;
-
-  const shouldUseNativeScroll = window.matchMedia('(prefers-reduced-motion: reduce), (hover: none), (pointer: coarse)').matches;
-  if (shouldUseNativeScroll) {
-    ScrollTrigger.update();
-    return;
-  }
-
   // Initialize Lenis for smooth scroll effects. Lerp value controls the smoothness.
-  const lenis = new Lenis({ lerp: 0.22 });
+  const lenis = new Lenis({ lerp: 0.12 });
   
   // Sync ScrollTrigger with Lenis' scroll updates.
   lenis.on('scroll', ScrollTrigger.update);
